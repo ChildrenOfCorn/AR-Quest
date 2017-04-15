@@ -229,7 +229,7 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
             // activate the shader program and bind the vertex/normal/tex coords
             GLES20.glUseProgram(shaderProgramID);
 
-            if (!mActivity.isExtendedTrackingActive()) {
+            if (mActivity.get3DObjectType() == ImageTargets.ObjectType3D.TEAPOT) {
                 GLES20.glVertexAttribPointer(vertexHandle, 3, GLES20.GL_FLOAT,
                         false, 0, mTeapot.getVertices());
                 GLES20.glVertexAttribPointer(textureCoordHandle, 2,
