@@ -62,7 +62,7 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
     SampleApplicationSession vuforiaAppSession;
 
     private DataSet mCurrentDataset;
-    private int mCurrentDatasetSelectionIndex = 0;
+    private int mCurrentDatasetSelectionIndex = 2;
     private int mStartDatasetsIndex = 0;
     private int mDatasetsNumber = 0;
     private ArrayList<String> mDatasetStrings = new ArrayList<String>();
@@ -108,6 +108,7 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
         startLoadingAnimation();
         mDatasetStrings.add("StonesAndChips.xml");
         mDatasetStrings.add("Tarmac.xml");
+        mDatasetStrings.add("AR-Quest.xml");
 
         vuforiaAppSession
                 .initAR(this, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -381,7 +382,8 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
                 Log.e(LOGTAG, "Unable to enable continuous autofocus");
 
             mSampleAppMenu = new SampleAppMenu(this, this, "Image Targets",
-                    mGlView, mUILayout, null);
+                mGlView, mUILayout, null);
+            startExtendedTracking();
             setSampleAppMenuSettings();
         } else {
             Log.e(LOGTAG, exception.getString());
@@ -526,6 +528,7 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
         group = mSampleAppMenu.addGroup("", true);
         group.addSelectionItem(getString(R.string.menu_extended_tracking),
                 CMD_EXTENDED_TRACKING, false);
+            CMD_EXTENDED_TRACKING, true);
         group.addSelectionItem(getString(R.string.menu_contAutofocus),
                 CMD_AUTOFOCUS, mContAutofocus);
         mFlashOptionView = group.addSelectionItem(
@@ -556,10 +559,52 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
         mStartDatasetsIndex = CMD_DATASET_START_INDEX;
         mDatasetsNumber = mDatasetStrings.size();
 
-        group.addRadioItem("Stones & Chips", mStartDatasetsIndex, true);
+        group.addRadioItem("Stones & Chips", mStartDatasetsIndex, false);
         group.addRadioItem("Tarmac", mStartDatasetsIndex + 1, false);
 
+        group.addRadioItem("AR-Quest", mStartDatasetsIndex + 2, true);
+
         mSampleAppMenu.attachMenu();
+    }
+
+
+    boolean startExtendedTracking() {
+        boolean result = true;
+        for (int tIdx = 0; tIdx < mCurrentDataset.getNumTrackables(); tIdx++)
+        {
+            Trackable trackable = mCurrentDataset.getTrackable(tIdx);
+
+            if (!mExtendedTracking)
+            {
+                if (!trackable.startExtendedTracking())
+                {
+                    Log.e(LOGTAG,
+                          "Failed to start extended tracking target");
+                    result = false;
+                } else
+                {
+                    Log.d(LOGTAG,
+                          "Successfully started extended tracking target");
+                }
+            } else
+            {
+                if (!trackable.stopExtendedTracking())
+                {
+                    Log.e(LOGTAG,
+                          "Failed to stop extended tracking target");
+                    result = false;
+                } else
+                {
+                    Log.d(LOGTAG,
+                          "Successfully started extended tracking target");
+                }
+            }
+        }
+
+        if (result)
+            mExtendedTracking = !mExtendedTracking;
+
+        return result;
     }
 
     @Override
@@ -671,6 +716,7 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
                 if (result)
                     mExtendedTracking = !mExtendedTracking;
 
+                result = startExtendedTracking();
                 break;
 
             default:
