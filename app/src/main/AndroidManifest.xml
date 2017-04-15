@@ -84,18 +84,18 @@
           Activity.setRequestedOrientation().
         -->
         <!-- Splash Screen Activity -->
-         <activity
-            android:name=".ui.ActivityList.ActivitySplashScreen"
-            android:configChanges="orientation|keyboardHidden|screenSize|smallestScreenSize"
-            android:screenOrientation="portrait"
-            android:noHistory="true"
-            >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+         <!--<activity-->
+            <!--android:name=".ui.ActivityList.ActivitySplashScreen"-->
+            <!--android:configChanges="orientation|keyboardHidden|screenSize|smallestScreenSize"-->
+            <!--android:screenOrientation="portrait"-->
+            <!--android:noHistory="true"-->
+            <!--&gt;-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-         </activity>
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
+         <!--</activity>-->
         
         <activity
             android:name=".ui.ActivityList.ActivityLauncher"
@@ -118,6 +118,12 @@
             android:theme="@style/SampleAppsTheme"
             android:launchMode="singleTask"
             >
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
 
         <activity
