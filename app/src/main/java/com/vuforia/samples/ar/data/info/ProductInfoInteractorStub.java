@@ -1,6 +1,9 @@
 package com.vuforia.samples.ar.data.info;
 
+import com.vuforia.samples.ar.data.models.Comment;
 import com.vuforia.samples.ar.data.models.ProductInfo;
+
+import java.util.ArrayList;
 
 /**
  * Created by grishberg on 15.04.17.
@@ -33,6 +36,11 @@ public class ProductInfoInteractorStub implements ProductInfoInteractor {
                 productInfo.setName("Гиннес");
                 productInfo.setBriefDesc("Нямка");
                 productInfo.setUrl("https://ru.wikipedia.org/wiki/Гиннесс");
+                ArrayList<Comment>comments = new ArrayList<>(3);
+                comments.add(new Comment("Круть", null));
+                comments.add(new Comment("Буль-Буль", null));
+                comments.add(new Comment("Где я Оо", null));
+                productInfo.setComments(comments);
                 break;
             case 3:
                 productInfo.setName("Жигуль!");
