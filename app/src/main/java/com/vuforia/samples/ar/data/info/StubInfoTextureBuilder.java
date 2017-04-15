@@ -1,6 +1,7 @@
 package com.vuforia.samples.ar.data.info;
 
 import android.content.res.AssetManager;
+import android.opengl.GLES20;
 
 import com.vuforia.samples.SampleApplication.utils.Texture;
 import com.vuforia.samples.ar.data.models.ProductInfo;
@@ -12,20 +13,38 @@ import com.vuforia.samples.ar.data.models.ProductInfo;
 public class StubInfoTextureBuilder implements InfoTextureBuilder {
     private final AssetManager assetManager;
 
+
     public StubInfoTextureBuilder(AssetManager assetManager) {
         this.assetManager = assetManager;
     }
 
     @Override
     public Texture getTextureBitmapFromInfo(ProductInfo productInfo) {
-        switch (productInfo.getId()) {
+        Texture texture = null;
+        switch ((int) productInfo.getId()) {
             case 1:
-                return Texture.loadTextureFromApk("TextureTeapotBrass.png", assetManager);
+                texture = Texture.loadTextureFromApk("TextureTeapotBrass.png", assetManager);
+                break;
             case 2:
-                return Texture.loadTextureFromApk("TextureTeapotBlue.png", assetManager);
+                texture = Texture.loadTextureFromApk("TextureTeapotBlue.png", assetManager);
+                break;
             case 3:
-                return Texture.loadTextureFromApk("TextureTeapotRed.png", assetManager);
+                texture = Texture.loadTextureFromApk("TextureTeapotRed.png", assetManager);
+                break;
         }
-        return null;
+        initTexture(texture);
+        return texture;
+    }
+
+    private void initTexture(Texture texture) {
+        GLES20.glGenTextures(1, texture.mTextureID, 0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture.mTextureID[0]);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
+                GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
+                GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA,
+                texture.mWidth, texture.mHeight, 0, GLES20.GL_RGBA,
+                GLES20.GL_UNSIGNED_BYTE, texture.mData);
     }
 }

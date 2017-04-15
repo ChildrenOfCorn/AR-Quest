@@ -37,12 +37,19 @@ import com.vuforia.samples.SampleApplication.utils.SampleApplication3DModel;
 import com.vuforia.samples.SampleApplication.utils.SampleUtils;
 import com.vuforia.samples.SampleApplication.utils.Teapot;
 import com.vuforia.samples.SampleApplication.utils.Texture;
+import com.vuforia.samples.ar.data.info.InfoTextureBuilder;
+import com.vuforia.samples.ar.data.info.ProductInfoInteractor;
 import com.vuforia.samples.ar.data.models.ObjectInfo;
+import com.vuforia.samples.ar.data.models.ProductInfo;
+import com.vuforia.samples.ar.di.DiContainer;
 
 // The renderer class for the ImageTargets sample.
 public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRendererControl {
     private static final String LOGTAG = "ImageTargetRenderer";
-    public static final float PANEL_RIGHT_OFFSET = 0.2f;
+    private static final float PANEL_RIGHT_OFFSET = 0.2f;
+
+    private ProductInfoInteractor productInfoInteractor;
+    private InfoTextureBuilder infoTextureBuilder;
 
     private SampleApplicationSession vuforiaAppSession;
     private ImageTargets mActivity;
@@ -68,6 +75,9 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
     private static final float OBJECT_SCALE_FLOAT = 0.001f;
 
     public ImageTargetRenderer(ImageTargets activity, SampleApplicationSession session) {
+        productInfoInteractor = DiContainer.provideProductInfoInteractor();
+        infoTextureBuilder = DiContainer.provideInfoTextureBuilder();
+
         mActivity = activity;
         vuforiaAppSession = session;
         // SampleAppRenderer used to encapsulate the use of RenderingPrimitives setting
@@ -188,16 +198,12 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
         for (int tIdx = 0; tIdx < state.getNumTrackableResults(); tIdx++) {
             TrackableResult result = state.getTrackableResult(tIdx);
             Trackable trackable = result.getTrackable();
+            Texture currentTexture = getTextureByObjectInfo((ObjectInfo) trackable.getUserData());
+
             printUserData(trackable);
             Matrix44F modelViewMatrix_Vuforia = Tool
                     .convertPose2GLMatrix(result.getPose());
             float[] modelViewMatrix = modelViewMatrix_Vuforia.getData();
-
-            // Определяем индекст текстуры
-            int textureIndex = trackable.getName().equalsIgnoreCase("stones") ? 0
-                    : 1;
-            textureIndex = trackable.getName().equalsIgnoreCase("tarmac") ? 2
-                    : textureIndex;
 
             // deal with the modelview and projection matrices
             float[] modelViewProjection = new float[16];
@@ -213,34 +219,32 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
             // activate the shader program and bind the vertex/normal/tex coords
             GLES20.glUseProgram(shaderProgramID);
 
-            if (true/*mActivity.isExtendedTrackingActive()*/) {
-                GLES20.glVertexAttribPointer(vertexHandle, 3, GLES20.GL_FLOAT,
-                        false, 0, panel.getVertices());
-                GLES20.glVertexAttribPointer(textureCoordHandle, 2,
-                        GLES20.GL_FLOAT, false, 0, panel.getTexCoords());
+            GLES20.glVertexAttribPointer(vertexHandle, 3, GLES20.GL_FLOAT,
+                    false, 0, panel.getVertices());
+            GLES20.glVertexAttribPointer(textureCoordHandle, 2,
+                    GLES20.GL_FLOAT, false, 0, panel.getTexCoords());
 
-                GLES20.glEnableVertexAttribArray(vertexHandle);
-                GLES20.glEnableVertexAttribArray(textureCoordHandle);
+            GLES20.glEnableVertexAttribArray(vertexHandle);
+            GLES20.glEnableVertexAttribArray(textureCoordHandle);
 
-                // activate texture 0, bind it, and pass to shader
-                GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,
-                        mTextures.get(textureIndex).mTextureID[0]);
-                GLES20.glUniform1i(texSampler2DHandle, 0);
+            // activate texture 0, bind it, and pass to shader
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, currentTexture.mTextureID[0]);
+            GLES20.glUniform1i(texSampler2DHandle, 0);
 
-                // pass the model view matrix to the shader
-                GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false,
-                        modelViewProjection, 0);
+            // pass the model view matrix to the shader
+            GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false,
+                    modelViewProjection, 0);
 
-                // finally draw the teapot
-                GLES20.glDrawElements(GLES20.GL_TRIANGLES,
-                        panel.getNumObjectIndex(), GLES20.GL_UNSIGNED_SHORT,
-                        panel.getIndices());
+            // finally draw the teapot
+            GLES20.glDrawElements(GLES20.GL_TRIANGLES,
+                    panel.getNumObjectIndex(), GLES20.GL_UNSIGNED_SHORT,
+                    panel.getIndices());
 
-                // disable the enabled arrays
-                GLES20.glDisableVertexAttribArray(vertexHandle);
-                GLES20.glDisableVertexAttribArray(textureCoordHandle);
-            }
+            // disable the enabled arrays
+            GLES20.glDisableVertexAttribArray(vertexHandle);
+            GLES20.glDisableVertexAttribArray(textureCoordHandle);
+
             SampleUtils.checkGLError("Render Frame");
         }
 
@@ -254,5 +258,11 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
 
     public void setTextures(Vector<Texture> textures) {
         mTextures = textures;
+    }
+
+    private Texture getTextureByObjectInfo(ObjectInfo objectInfo) {
+        ProductInfo productInfo = productInfoInteractor.getProductInfoByTargetId(objectInfo.getId());
+        Texture texture = infoTextureBuilder.getTextureBitmapFromInfo(productInfo);
+        return texture;
     }
 }

@@ -63,8 +63,6 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
     private static final String TAG = "ImageTargets";
     SampleApplicationSession vuforiaAppSession;
 
-    private final ProductInfoInteractor productInfoInteractor = DiContainer.provideProductInfoInteractor();
-
     private DataSet mCurrentDataset;
     private int mCurrentDatasetSelectionIndex = 2;
     private int mStartDatasetsIndex = 0;

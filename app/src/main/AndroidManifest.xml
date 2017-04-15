@@ -66,6 +66,7 @@
         android:launchMode="singleTask"
         android:allowBackup="true"
         android:theme="@style/SampleAppsTheme"
+        android:name="com.vuforia.samples.App"
         >
         
 
