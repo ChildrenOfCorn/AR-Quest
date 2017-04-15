@@ -51,6 +51,7 @@ import com.vuforia.samples.SampleApplication.utils.LoadingDialogHandler;
 import com.vuforia.samples.SampleApplication.utils.SampleApplicationGLView;
 import com.vuforia.samples.SampleApplication.utils.Texture;
 import com.vuforia.samples.VuforiaSamples.R;
+import com.vuforia.samples.VuforiaSamples.app.ProductInfoDetails.ProductInfoActivity;
 import com.vuforia.samples.VuforiaSamples.ui.SampleAppMenu.SampleAppMenu;
 import com.vuforia.samples.VuforiaSamples.ui.SampleAppMenu.SampleAppMenuGroup;
 import com.vuforia.samples.VuforiaSamples.ui.SampleAppMenu.SampleAppMenuInterface;
@@ -118,7 +119,7 @@ public class ImageTargets extends Activity implements SampleApplicationControl, 
         mGestureDetector = new GestureDetector(this, new ImageTargetGestureListener(this));
 
         // Load any sample specific textures:
-        mTextures = new Vector<Texture>();
+        mTextures = new Vector<>();
         loadTextures();
 
         mIsDroidDevice = android.os.Build.MODEL.toLowerCase().startsWith(
@@ -133,9 +134,7 @@ public class ImageTargets extends Activity implements SampleApplicationControl, 
 
     @Override
     public void onDetailsClicked(ProductInfo productInfo) {
-
-        //todo
-
+        ProductInfoActivity.startActivity(this, productInfo);
     }
 
     @Override

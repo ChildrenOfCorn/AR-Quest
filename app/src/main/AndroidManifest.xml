@@ -190,6 +190,9 @@
             android:launchMode="singleTask"
             >
         </activity>
+
+        <activity android:name=".app.ProductInfoDetails.ProductInfoActivity"
+            android:screenOrientation="portrait"/>
          
     </application>
 
