@@ -24,6 +24,7 @@ import android.hardware.Camera.CameraInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -36,7 +37,6 @@ import android.widget.Toast;
 
 import com.vuforia.CameraDevice;
 import com.vuforia.DataSet;
-import com.vuforia.Device;
 import com.vuforia.ObjectTracker;
 import com.vuforia.State;
 import com.vuforia.STORAGE_TYPE;
@@ -54,12 +54,16 @@ import com.vuforia.samples.VuforiaSamples.R;
 import com.vuforia.samples.VuforiaSamples.ui.SampleAppMenu.SampleAppMenu;
 import com.vuforia.samples.VuforiaSamples.ui.SampleAppMenu.SampleAppMenuGroup;
 import com.vuforia.samples.VuforiaSamples.ui.SampleAppMenu.SampleAppMenuInterface;
+import com.vuforia.samples.ar.data.info.ProductInfoInteractor;
+import com.vuforia.samples.ar.data.models.ObjectInfo;
+import com.vuforia.samples.ar.di.DiContainer;
 
 public class ImageTargets extends Activity implements SampleApplicationControl,
         SampleAppMenuInterface {
-    private static final String LOGTAG = "ImageTargets";
-
+    private static final String TAG = "ImageTargets";
     SampleApplicationSession vuforiaAppSession;
+
+    private final ProductInfoInteractor productInfoInteractor = DiContainer.provideProductInfoInteractor();
 
     private DataSet mCurrentDataset;
     private int mCurrentDatasetSelectionIndex = 2;
@@ -100,7 +104,7 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
     // activity.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(LOGTAG, "onCreate");
+        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
 
         vuforiaAppSession = new SampleApplicationSession(this);
@@ -169,7 +173,7 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
     // Called when the activity will start interacting with the user.
     @Override
     protected void onResume() {
-        Log.d(LOGTAG, "onResume");
+        Log.d(TAG, "onResume");
         super.onResume();
 
         // This is needed for some Droid devices to force portrait
@@ -181,7 +185,7 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
         try {
             vuforiaAppSession.resumeAR();
         } catch (SampleApplicationException e) {
-            Log.e(LOGTAG, e.getString());
+            Log.e(TAG, e.getString());
         }
 
         // Resume the GL view:
@@ -194,7 +198,7 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
     // Callback for configuration changes the activity handles itself
     @Override
     public void onConfigurationChanged(Configuration config) {
-        Log.d(LOGTAG, "onConfigurationChanged");
+        Log.d(TAG, "onConfigurationChanged");
         super.onConfigurationChanged(config);
 
         vuforiaAppSession.onConfigurationChanged();
@@ -203,7 +207,7 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
     // Called when the system is about to start resuming a previous activity.
     @Override
     protected void onPause() {
-        Log.d(LOGTAG, "onPause");
+        Log.d(TAG, "onPause");
         super.onPause();
 
         if (mGlView != null) {
@@ -224,20 +228,20 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
         try {
             vuforiaAppSession.pauseAR();
         } catch (SampleApplicationException e) {
-            Log.e(LOGTAG, e.getString());
+            Log.e(TAG, e.getString());
         }
     }
 
     // The final call you receive before your activity is destroyed.
     @Override
     protected void onDestroy() {
-        Log.d(LOGTAG, "onDestroy");
+        Log.d(TAG, "onDestroy");
         super.onDestroy();
 
         try {
             vuforiaAppSession.stopAR();
         } catch (SampleApplicationException e) {
-            Log.e(LOGTAG, e.getString());
+            Log.e(TAG, e.getString());
         }
 
         // Unload texture:
@@ -311,14 +315,24 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
             if (isExtendedTrackingActive()) {
                 trackable.startExtendedTracking();
             }
-
-            String name = "Current Dataset : " + trackable.getName();
-            trackable.setUserData(name);
-            Log.d(LOGTAG, "UserData:Set the following user data "
-                    + (String) trackable.getUserData());
+            ObjectInfo objectInfo = getObjectIdFromTrackable(trackable);
+            trackable.setUserData(objectInfo);
+            Log.d(TAG, "UserData:Set the following user data "
+                    + trackable.getUserData());
         }
 
         return true;
+    }
+
+    @Nullable
+    private ObjectInfo getObjectIdFromTrackable(Trackable trackable) {
+        String name = trackable.getName();
+        try {
+            return new ObjectInfo(Long.valueOf(name), name);
+        } catch (NumberFormatException e) {
+            Log.e(TAG, "getObjectIdFromTrackable: ", e);
+        }
+        return null;
     }
 
     @Override
@@ -370,7 +384,7 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
             try {
                 vuforiaAppSession.startAR(CameraDevice.CAMERA_DIRECTION.CAMERA_DIRECTION_DEFAULT);
             } catch (SampleApplicationException e) {
-                Log.e(LOGTAG, e.getString());
+                Log.e(TAG, e.getString());
             }
 
             boolean result = CameraDevice.getInstance().setFocusMode(
@@ -379,14 +393,14 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
             if (result)
                 mContAutofocus = true;
             else
-                Log.e(LOGTAG, "Unable to enable continuous autofocus");
+                Log.e(TAG, "Unable to enable continuous autofocus");
 
             mSampleAppMenu = new SampleAppMenu(this, this, "Image Targets",
                     mGlView, mUILayout, null);
             startExtendedTracking();
             setSampleAppMenuSettings();
         } else {
-            Log.e(LOGTAG, exception.getString());
+            Log.e(TAG, exception.getString());
             showInitializationErrorMessage(exception.getString());
         }
     }
@@ -430,7 +444,7 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
                     .getClassType());
             if (ot == null || mCurrentDataset == null
                     || ot.getActiveDataSet(0) == null) {
-                Log.d(LOGTAG, "Failed to swap datasets");
+                Log.d(TAG, "Failed to swap datasets");
                 return;
             }
 
@@ -451,11 +465,11 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
         tracker = tManager.initTracker(ObjectTracker.getClassType());
         if (tracker == null) {
             Log.e(
-                    LOGTAG,
+                    TAG,
                     "Tracker not initialized. Tracker already initialized or the camera is already started");
             result = false;
         } else {
-            Log.i(LOGTAG, "Tracker successfully initialized");
+            Log.i(TAG, "Tracker successfully initialized");
         }
         return result;
     }
@@ -573,20 +587,20 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
 
             if (!mExtendedTracking) {
                 if (!trackable.startExtendedTracking()) {
-                    Log.e(LOGTAG,
+                    Log.e(TAG,
                             "Failed to start extended tracking target");
                     result = false;
                 } else {
-                    Log.d(LOGTAG,
+                    Log.d(TAG,
                             "Successfully started extended tracking target");
                 }
             } else {
                 if (!trackable.stopExtendedTracking()) {
-                    Log.e(LOGTAG,
+                    Log.e(TAG,
                             "Failed to stop extended tracking target");
                     result = false;
                 } else {
-                    Log.d(LOGTAG,
+                    Log.d(TAG,
                             "Successfully started extended tracking target");
                 }
             }
@@ -616,7 +630,7 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
                 } else {
                     showToast(getString(mFlash ? R.string.menu_flash_error_off
                             : R.string.menu_flash_error_on));
-                    Log.e(LOGTAG,
+                    Log.e(TAG,
                             getString(mFlash ? R.string.menu_flash_error_off
                                     : R.string.menu_flash_error_on));
                 }
@@ -632,7 +646,7 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
                         mContAutofocus = false;
                     } else {
                         showToast(getString(R.string.menu_contAutofocus_error_off));
-                        Log.e(LOGTAG,
+                        Log.e(TAG,
                                 getString(R.string.menu_contAutofocus_error_off));
                     }
                 } else {
@@ -643,7 +657,7 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
                         mContAutofocus = true;
                     } else {
                         showToast(getString(R.string.menu_contAutofocus_error_on));
-                        Log.e(LOGTAG,
+                        Log.e(TAG,
                                 getString(R.string.menu_contAutofocus_error_on));
                     }
                 }
@@ -673,7 +687,7 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
                     mRenderer.updateConfiguration();
                 } catch (SampleApplicationException e) {
                     showToast(e.getString());
-                    Log.e(LOGTAG, e.getString());
+                    Log.e(TAG, e.getString());
                     result = false;
                 }
                 doStartTrackers();
@@ -685,20 +699,20 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
 
                     if (!mExtendedTracking) {
                         if (!trackable.startExtendedTracking()) {
-                            Log.e(LOGTAG,
+                            Log.e(TAG,
                                     "Failed to start extended tracking target");
                             result = false;
                         } else {
-                            Log.d(LOGTAG,
+                            Log.d(TAG,
                                     "Successfully started extended tracking target");
                         }
                     } else {
                         if (!trackable.stopExtendedTracking()) {
-                            Log.e(LOGTAG,
+                            Log.e(TAG,
                                     "Failed to stop extended tracking target");
                             result = false;
                         } else {
-                            Log.d(LOGTAG,
+                            Log.d(TAG,
                                     "Successfully started extended tracking target");
                         }
                     }

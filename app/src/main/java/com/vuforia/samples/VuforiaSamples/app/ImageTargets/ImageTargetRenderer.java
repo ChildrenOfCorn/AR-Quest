@@ -37,6 +37,7 @@ import com.vuforia.samples.SampleApplication.utils.SampleApplication3DModel;
 import com.vuforia.samples.SampleApplication.utils.SampleUtils;
 import com.vuforia.samples.SampleApplication.utils.Teapot;
 import com.vuforia.samples.SampleApplication.utils.Texture;
+import com.vuforia.samples.ar.data.models.ObjectInfo;
 
 // The renderer class for the ImageTargets sample.
 public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRendererControl {
@@ -239,28 +240,7 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
                 // disable the enabled arrays
                 GLES20.glDisableVertexAttribArray(vertexHandle);
                 GLES20.glDisableVertexAttribArray(textureCoordHandle);
-            } /*else {
-                GLES20.glDisable(GLES20.GL_CULL_FACE);
-                GLES20.glVertexAttribPointer(vertexHandle, 3, GLES20.GL_FLOAT,
-                        false, 0, panel.getVertices());
-                GLES20.glVertexAttribPointer(textureCoordHandle, 2,
-                        GLES20.GL_FLOAT, false, 0, panel.getTexCoords());
-
-                GLES20.glEnableVertexAttribArray(vertexHandle);
-                GLES20.glEnableVertexAttribArray(textureCoordHandle);
-
-                GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,
-                        mTextures.get(3).mTextureID[0]);
-                GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false,
-                        modelViewProjection, 0);
-                GLES20.glUniform1i(texSampler2DHandle, 0);
-                GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0,
-                        panel.getNumObjectVertex());
-
-                SampleUtils.checkGLError("Renderer DrawBuildings");
             }
-            */
             SampleUtils.checkGLError("Render Frame");
         }
 
@@ -268,7 +248,7 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
     }
 
     private void printUserData(Trackable trackable) {
-        String userData = (String) trackable.getUserData();
+        ObjectInfo userData = (ObjectInfo) trackable.getUserData();
         Log.d(LOGTAG, "UserData:Retreived User Data	\"" + userData + "\"");
     }
 
