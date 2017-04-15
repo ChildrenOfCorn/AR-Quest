@@ -1,7 +1,6 @@
 package com.vuforia.samples.ar.data.info;
 
-import android.graphics.Bitmap;
-
+import com.vuforia.samples.SampleApplication.utils.Texture;
 import com.vuforia.samples.ar.data.models.ProductInfo;
 
 /**
@@ -10,5 +9,5 @@ import com.vuforia.samples.ar.data.models.ProductInfo;
  */
 
 public interface InfoTextureBuilder {
-    Bitmap getTextureBitmapFromInfo(ProductInfo productInfo);
+    Texture getTextureBitmapFromInfo(ProductInfo productInfo);
 }

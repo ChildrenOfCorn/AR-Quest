@@ -1,6 +1,10 @@
 package com.vuforia.samples.ar.di;
 
+import com.vuforia.samples.App;
+import com.vuforia.samples.ar.data.info.InfoTextureBuilder;
 import com.vuforia.samples.ar.data.info.ProductInfoInteractor;
+import com.vuforia.samples.ar.data.info.ProductInfoInteractorStub;
+import com.vuforia.samples.ar.data.info.StubInfoTextureBuilder;
 
 /**
  * Created by grishberg on 15.04.17.
@@ -9,6 +13,10 @@ import com.vuforia.samples.ar.data.info.ProductInfoInteractor;
 
 public class DiContainer {
     public static ProductInfoInteractor provideProductInfoInteractor() {
-        return null;
+        return new ProductInfoInteractorStub();
+    }
+
+    public static InfoTextureBuilder provideInfoTextureBuilder() {
+        return new StubInfoTextureBuilder(App.getAppContext().getAssets());
     }
 }

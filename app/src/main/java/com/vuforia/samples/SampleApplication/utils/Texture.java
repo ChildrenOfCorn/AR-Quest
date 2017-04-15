@@ -20,6 +20,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import com.vuforia.samples.ar.data.info.InfoTextureBuilder;
+import com.vuforia.samples.ar.data.models.ProductInfo;
 
 // Support class for the Vuforia samples applications.
 // Exposes functionality for loading a texture from the APK.
@@ -99,5 +101,14 @@ public class Texture
         
         texture.mSuccess = true;
         return texture;
+    }
+
+    public static Texture loadTextureFromProductInfo(Bitmap bitMap){
+        int[] data = new int[bitMap.getWidth() * bitMap.getHeight()];
+        bitMap.getPixels(data, 0, bitMap.getWidth(), 0, 0,
+                bitMap.getWidth(), bitMap.getHeight());
+
+        return loadTextureFromIntBuffer(data, bitMap.getWidth(),
+                bitMap.getHeight());
     }
 }
