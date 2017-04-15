@@ -11,6 +11,7 @@ countries.
 package com.vuforia.samples.VuforiaSamples.app.ImageTargets;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Vector;
 
 import android.app.Activity;
@@ -54,13 +55,13 @@ import com.vuforia.samples.VuforiaSamples.R;
 import com.vuforia.samples.VuforiaSamples.ui.SampleAppMenu.SampleAppMenu;
 import com.vuforia.samples.VuforiaSamples.ui.SampleAppMenu.SampleAppMenuGroup;
 import com.vuforia.samples.VuforiaSamples.ui.SampleAppMenu.SampleAppMenuInterface;
-import com.vuforia.samples.ar.data.info.ProductInfoInteractor;
 import com.vuforia.samples.ar.data.models.ObjectInfo;
-import com.vuforia.samples.ar.di.DiContainer;
+
 
 public class ImageTargets extends Activity implements SampleApplicationControl,
         SampleAppMenuInterface {
     private static final String TAG = "ImageTargets";
+
     SampleApplicationSession vuforiaAppSession;
 
     private DataSet mCurrentDataset;

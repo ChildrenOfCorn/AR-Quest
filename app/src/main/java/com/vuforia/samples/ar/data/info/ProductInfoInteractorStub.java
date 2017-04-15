@@ -26,14 +26,17 @@ public class ProductInfoInteractorStub implements ProductInfoInteractor {
         switch ((int) id) {
             case 1:
                 productInfo.setName("Кока кола");
+                productInfo.setBriefDesc("Очень вкусная");
                 productInfo.setUrl("https://ru.wikipedia.org/wiki/Кока-кола");
                 break;
             case 2:
                 productInfo.setName("Гиннес");
+                productInfo.setBriefDesc("Нямка");
                 productInfo.setUrl("https://ru.wikipedia.org/wiki/Гиннесс");
                 break;
             case 3:
                 productInfo.setName("Жигуль!");
+                productInfo.setBriefDesc("Дешево и сердито");
                 productInfo.setUrl("https://ru.wikipedia.org/wiki/Жигулёвское");
                 break;
         }

@@ -207,6 +207,8 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
 
             if (prevTexture == null) {
                 continue;
+            } else if(!prevTexture.isReady()) {
+                initTexture(prevTexture);
             }
 
             Matrix44F modelViewMatrix_Vuforia = Tool
@@ -267,6 +269,18 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
         productInfoInteractor.getProductInfoByTargetId(objectInfo.getId());
     }
 
+    private void initTexture(final Texture texture) {
+        GLES20.glGenTextures(1, texture.mTextureID, 0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture.mTextureID[0]);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
+                               GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
+                               GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA,
+                            texture.mWidth, texture.mHeight, 0, GLES20.GL_RGBA,
+                            GLES20.GL_UNSIGNED_BYTE, texture.mData);
+        texture.setReady(true);
+    }
     @Override
     public void onProductInfoReceived(@NonNull ProductInfo productInfo) {
         Log.d(LOGTAG, "UserData:Retrieved User Data	\"" + productInfo + "\"");

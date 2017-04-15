@@ -35,6 +35,8 @@ public class Texture
     public ByteBuffer mData;    // The pixel data.
     public int[] mTextureID = new int[1];
     public boolean mSuccess = false;
+
+    boolean mReady = true;
     
     
     /* Factory function to load a texture from the APK. */
@@ -103,12 +105,39 @@ public class Texture
         return texture;
     }
 
-    public static Texture loadTextureFromProductInfo(Bitmap bitMap){
+    public static Texture loadTextureFromBitmap(Bitmap bitMap){
         int[] data = new int[bitMap.getWidth() * bitMap.getHeight()];
         bitMap.getPixels(data, 0, bitMap.getWidth(), 0, 0,
                 bitMap.getWidth(), bitMap.getHeight());
 
         return loadTextureFromIntBuffer(data, bitMap.getWidth(),
                 bitMap.getHeight());
+    }
+
+    public static Texture loadTextureFromARGBBitmap(Bitmap bitMap) {
+
+        int[] data = new int[bitMap.getWidth() * bitMap.getHeight()];
+        for ( int y = 0; y < bitMap.getHeight(); y++ )
+            for ( int x = 0; x < bitMap.getWidth(); x++ )
+            {
+                int pixel = bitMap.getPixel(x, y);
+                int alpha = (pixel >> 24) & 0xFF;
+                int red = (pixel >> 16) & 0xFF;
+                int green = (pixel >> 8 ) & 0xFF;
+                int blue = (pixel) & 0xFF;
+                data[y*bitMap.getWidth() + x]=(red<<24 |green << 16 | blue << 8 | alpha);
+            }
+        Texture texture = loadTextureFromIntBuffer(data, bitMap.getWidth(),
+                                        bitMap.getHeight());
+        texture.mReady = false;
+        return texture;
+    }
+
+    public void setReady(final boolean ready) {
+        this.mReady = ready;
+    }
+
+    public boolean isReady() {
+        return mReady;
     }
 }
