@@ -36,13 +36,14 @@ import com.vuforia.samples.SampleApplication.utils.CubeShaders;
 import com.vuforia.samples.SampleApplication.utils.LoadingDialogHandler;
 import com.vuforia.samples.SampleApplication.utils.SampleApplication3DModel;
 import com.vuforia.samples.SampleApplication.utils.SampleUtils;
-import com.vuforia.samples.SampleApplication.utils.Teapot;
 import com.vuforia.samples.SampleApplication.utils.Texture;
 import com.vuforia.samples.ar.data.info.InfoTextureBuilder;
 import com.vuforia.samples.ar.data.info.ProductInfoInteractor;
 import com.vuforia.samples.ar.data.models.ObjectInfo;
 import com.vuforia.samples.ar.data.models.ProductInfo;
 import com.vuforia.samples.ar.di.DiContainer;
+
+import lombok.Getter;
 
 // The renderer class for the ImageTargets sample.
 public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRendererControl,
@@ -67,6 +68,11 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
     private int texSampler2DHandle;
 
     private Panel panel;
+    private long lastTargetId = -1;
+
+    @Getter
+    private ProductInfo currentProductInfo;
+    private ProductInfo lastProductInfo;
 
     private float kBuildingScale = 0.012f;
     private SampleApplication3DModel mBuildingsModel;
@@ -199,11 +205,15 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
         GLES20.glEnable(GLES20.GL_CULL_FACE);
         GLES20.glCullFace(GLES20.GL_BACK);
 
+        boolean objectinfoRequested = false;
+
         // Did we find any trackables this frame?
         for (int tIdx = 0; tIdx < state.getNumTrackableResults(); tIdx++) {
             TrackableResult result = state.getTrackableResult(tIdx);
             Trackable trackable = result.getTrackable();
-            getTextureByObjectInfo((ObjectInfo) trackable.getUserData());
+
+            getTextureByObjectInfoIfRequired((ObjectInfo) trackable.getUserData());
+            objectinfoRequested = true;
 
             if (prevTexture == null) {
                 continue;
@@ -256,6 +266,10 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
             SampleUtils.checkGLError("Render Frame");
         }
 
+        if (!objectinfoRequested) {
+            currentProductInfo = null;
+        }
+
         GLES20.glDisable(GLES20.GL_DEPTH_TEST);
     }
 
@@ -263,13 +277,29 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
         mTextures = textures;
     }
 
-    private void getTextureByObjectInfo(ObjectInfo objectInfo) {
-        productInfoInteractor.getProductInfoByTargetId(objectInfo.getId());
+    private void getTextureByObjectInfoIfRequired(ObjectInfo objectInfo) {
+        long targetId = objectInfo.getId();
+
+        if (targetId == lastTargetId) {
+            currentProductInfo = lastProductInfo;
+            return;
+        }
+
+        lastTargetId = targetId;
+
+        Log.d(LOGTAG, "Current product info was reset");
+        currentProductInfo = null;
+
+        productInfoInteractor.getProductInfoByTargetId(targetId);
     }
 
     @Override
     public void onProductInfoReceived(@NonNull ProductInfo productInfo) {
         Log.d(LOGTAG, "UserData:Retrieved User Data	\"" + productInfo + "\"");
+
+        this.currentProductInfo = productInfo;
+        this.lastProductInfo = productInfo;
+
         infoTextureBuilder.getTextureBitmapFromInfo(productInfo);
     }
 

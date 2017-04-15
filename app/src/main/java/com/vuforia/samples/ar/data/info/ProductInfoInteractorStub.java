@@ -7,15 +7,11 @@ import com.vuforia.samples.ar.data.models.ProductInfo;
  */
 
 public class ProductInfoInteractorStub implements ProductInfoInteractor {
-    private long lastTargetId = -1;
+
     private OnProductReceivedListener listener;
 
     @Override
     public void getProductInfoByTargetId(long recognizedTargetId) {
-        if (recognizedTargetId == lastTargetId) {
-            return;
-        }
-        lastTargetId = recognizedTargetId;
         if (listener != null) {
             listener.onProductInfoReceived(createProductInfoFromId(recognizedTargetId));
         }

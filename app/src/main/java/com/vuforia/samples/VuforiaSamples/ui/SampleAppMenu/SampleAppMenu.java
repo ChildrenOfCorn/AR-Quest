@@ -151,8 +151,7 @@ public class SampleAppMenu
     
     public boolean processEvent(MotionEvent event)
     {
-        boolean result = false;
-        result = mGestureDetector.onTouchEvent(event);
+        boolean result = mGestureDetector.onTouchEvent(event);
         
         if (event.getAction() == MotionEvent.ACTION_UP && !result)
         {

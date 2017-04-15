@@ -54,11 +54,10 @@ import com.vuforia.samples.VuforiaSamples.R;
 import com.vuforia.samples.VuforiaSamples.ui.SampleAppMenu.SampleAppMenu;
 import com.vuforia.samples.VuforiaSamples.ui.SampleAppMenu.SampleAppMenuGroup;
 import com.vuforia.samples.VuforiaSamples.ui.SampleAppMenu.SampleAppMenuInterface;
-import com.vuforia.samples.ar.data.info.ProductInfoInteractor;
 import com.vuforia.samples.ar.data.models.ObjectInfo;
-import com.vuforia.samples.ar.di.DiContainer;
+import com.vuforia.samples.ar.data.models.ProductInfo;
 
-public class ImageTargets extends Activity implements SampleApplicationControl,
+public class ImageTargets extends Activity implements SampleApplicationControl, ImageTargetTouchListener,
         SampleAppMenuInterface {
     private static final String TAG = "ImageTargets";
     SampleApplicationSession vuforiaAppSession;
@@ -67,7 +66,7 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
     private int mCurrentDatasetSelectionIndex = 2;
     private int mStartDatasetsIndex = 0;
     private int mDatasetsNumber = 0;
-    private ArrayList<String> mDatasetStrings = new ArrayList<String>();
+    private ArrayList<String> mDatasetStrings = new ArrayList<>();
 
     // Our OpenGL view:
     private SampleApplicationGLView mGlView;
@@ -95,6 +94,7 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
 
     // Alert Dialog used to display SDK errors
     private AlertDialog mErrorDialog;
+    private final Handler autofocusHandler = new Handler();
 
     boolean mIsDroidDevice = false;
 
@@ -115,7 +115,7 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
         vuforiaAppSession
                 .initAR(this, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        mGestureDetector = new GestureDetector(this, new GestureListener());
+        mGestureDetector = new GestureDetector(this, new ImageTargetGestureListener(this));
 
         // Load any sample specific textures:
         mTextures = new Vector<Texture>();
@@ -125,33 +125,34 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
                 "droid");
     }
 
-    // Process Single Tap event to trigger autofocus
-    private class GestureListener extends
-            GestureDetector.SimpleOnGestureListener {
-        // Used to set autofocus one second after a manual focus is triggered
-        private final Handler autofocusHandler = new Handler();
+    @Nullable
+    @Override
+    public ProductInfo getCurrentProductInfo() {
+        return mRenderer.getCurrentProductInfo();
+    }
 
-        @Override
-        public boolean onDown(MotionEvent e) {
-            return true;
-        }
+    @Override
+    public void onDetailsClicked(ProductInfo productInfo) {
 
-        @Override
-        public boolean onSingleTapUp(MotionEvent e) {
-            // Generates a Handler to trigger autofocus
-            // after 1 second
-            autofocusHandler.postDelayed(new Runnable() {
-                public void run() {
-                    boolean result = CameraDevice.getInstance().setFocusMode(
-                            CameraDevice.FOCUS_MODE.FOCUS_MODE_TRIGGERAUTO);
+        //todo
 
-                    if (!result)
-                        Log.e("SingleTapUp", "Unable to trigger focus");
-                }
-            }, 1000L);
+    }
 
-            return true;
-        }
+    @Override
+    public void onAutofocusRequested() {
+        // Generates a Handler to trigger autofocus
+        // after 1 second
+
+        autofocusHandler.postDelayed(new Runnable() {
+            public void run() {
+                boolean result = CameraDevice.getInstance().setFocusMode(
+                        CameraDevice.FOCUS_MODE.FOCUS_MODE_TRIGGERAUTO);
+
+                if (!result)
+                    Log.e("SingleTapUp", "Unable to trigger focus");
+            }
+        }, 1000L);
+
     }
 
     // We want to load specific textures from the APK, which we will later use
@@ -511,10 +512,6 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        // Process the Gestures
-        if (mSampleAppMenu != null && mSampleAppMenu.processEvent(event))
-            return true;
-
         return mGestureDetector.onTouchEvent(event);
     }
 
