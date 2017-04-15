@@ -1,6 +1,6 @@
 package com.vuforia.samples.ar.data.info;
 
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 
 import com.vuforia.samples.ar.data.models.ProductInfo;
 
@@ -10,6 +10,11 @@ import com.vuforia.samples.ar.data.models.ProductInfo;
  */
 
 public interface ProductInfoInteractor {
-    @Nullable
-    ProductInfo getProductInfoByTargetId(long recognizedTargetId);
+    void getProductInfoByTargetId(long recognizedTargetId);
+
+    void setOnProductReceivedListener(OnProductReceivedListener listener);
+
+    interface OnProductReceivedListener {
+        void onProductInfoReceived(@NonNull ProductInfo productInfo);
+    }
 }

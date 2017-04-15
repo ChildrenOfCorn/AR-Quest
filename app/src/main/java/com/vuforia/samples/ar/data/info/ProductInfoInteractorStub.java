@@ -1,7 +1,5 @@
 package com.vuforia.samples.ar.data.info;
 
-import android.support.annotation.Nullable;
-
 import com.vuforia.samples.ar.data.models.ProductInfo;
 
 /**
@@ -10,15 +8,17 @@ import com.vuforia.samples.ar.data.models.ProductInfo;
 
 public class ProductInfoInteractorStub implements ProductInfoInteractor {
     private long lastTargetId = -1;
+    private OnProductReceivedListener listener;
 
-    @Nullable
     @Override
-    public ProductInfo getProductInfoByTargetId(long recognizedTargetId) {
+    public void getProductInfoByTargetId(long recognizedTargetId) {
         if (recognizedTargetId == lastTargetId) {
-            return null;
+            return;
         }
         lastTargetId = recognizedTargetId;
-        return createProductInfoFromId(recognizedTargetId);
+        if (listener != null) {
+            listener.onProductInfoReceived(createProductInfoFromId(recognizedTargetId));
+        }
     }
 
     private ProductInfo createProductInfoFromId(long id) {
@@ -38,5 +38,10 @@ public class ProductInfoInteractorStub implements ProductInfoInteractor {
                 break;
         }
         return productInfo;
+    }
+
+    @Override
+    public void setOnProductReceivedListener(OnProductReceivedListener listener) {
+        this.listener = listener;
     }
 }

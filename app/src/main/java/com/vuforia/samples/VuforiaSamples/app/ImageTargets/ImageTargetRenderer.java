@@ -18,6 +18,7 @@ import javax.microedition.khronos.opengles.GL10;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.vuforia.Device;
@@ -44,7 +45,8 @@ import com.vuforia.samples.ar.data.models.ProductInfo;
 import com.vuforia.samples.ar.di.DiContainer;
 
 // The renderer class for the ImageTargets sample.
-public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRendererControl, InfoTextureBuilder.OnTextureBuildListener {
+public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRendererControl,
+        InfoTextureBuilder.OnTextureBuildListener, ProductInfoInteractor.OnProductReceivedListener {
     private static final String LOGTAG = "ImageTargetRenderer";
     private static final float PANEL_RIGHT_OFFSET = 0.2f;
 
@@ -77,9 +79,10 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
 
     public ImageTargetRenderer(ImageTargets activity, SampleApplicationSession session) {
         productInfoInteractor = DiContainer.provideProductInfoInteractor();
+        productInfoInteractor.setOnProductReceivedListener(this);
         infoTextureBuilder = DiContainer.provideInfoTextureBuilder();
         infoTextureBuilder.setTextureBuildListener(this);
-        
+
         mActivity = activity;
         vuforiaAppSession = session;
         // SampleAppRenderer used to encapsulate the use of RenderingPrimitives setting
@@ -260,13 +263,14 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
         mTextures = textures;
     }
 
-    private Texture getTextureByObjectInfo(ObjectInfo objectInfo) {
-        ProductInfo productInfo = productInfoInteractor.getProductInfoByTargetId(objectInfo.getId());
-        if (productInfo != null) {
-            Log.d(LOGTAG, "UserData:Retreived User Data	\"" + productInfo + "\"");
-            infoTextureBuilder.getTextureBitmapFromInfo(productInfo);
-        }
-        return prevTexture;
+    private void getTextureByObjectInfo(ObjectInfo objectInfo) {
+        productInfoInteractor.getProductInfoByTargetId(objectInfo.getId());
+    }
+
+    @Override
+    public void onProductInfoReceived(@NonNull ProductInfo productInfo) {
+        Log.d(LOGTAG, "UserData:Retrieved User Data	\"" + productInfo + "\"");
+        infoTextureBuilder.getTextureBitmapFromInfo(productInfo);
     }
 
     @Override
