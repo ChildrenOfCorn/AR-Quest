@@ -48,7 +48,6 @@ dependencies {
     String okhttp_version = "3.4.1"
     String lombok_version = "1.12.6"
     String retrofit_version = "2.2.0"
-    String rx_java_version = "2.0.1"
     String dagger_version = "2.9"
 
     compile "com.android.support:appcompat-v7:$support_version"
@@ -70,9 +69,6 @@ dependencies {
     compile "com.squareup.retrofit2:adapter-rxjava:$retrofit_version"
 
     compile 'com.google.code.gson:gson:2.7'
-
-    compile "io.reactivex.rxjava2:rxandroid:$rx_java_version"
-    compile "io.reactivex.rxjava2:rxjava:$rx_java_version"
 
     compile "com.google.dagger:dagger:$dagger_version"
     annotationProcessor "com.google.dagger:dagger-compiler:$dagger_version"

@@ -18,6 +18,7 @@ import java.nio.ByteOrder;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.util.Log;
 
 import com.vuforia.samples.ar.data.info.InfoTextureBuilder;
@@ -37,6 +38,9 @@ public class Texture
     public boolean mSuccess = false;
 
     boolean mReady = true;
+
+    final static int CHROMA_KEY = -18751;
+    final static int TARGET_COLOR = 0xaf000000;
     
     
     /* Factory function to load a texture from the APK. */
@@ -77,6 +81,9 @@ public class Texture
         for (int p = 0; p < numPixels; ++p)
         {
             int colour = data[p];
+            if (colour == CHROMA_KEY) {
+                colour = TARGET_COLOR;
+            }
             dataBytes[p * 4] = (byte) (colour >>> 16); // R
             dataBytes[p * 4 + 1] = (byte) (colour >>> 8); // G
             dataBytes[p * 4 + 2] = (byte) colour; // B
@@ -104,6 +111,7 @@ public class Texture
         texture.mSuccess = true;
         return texture;
     }
+
 
     public static Texture loadTextureFromBitmap(Bitmap bitMap){
         int[] data = new int[bitMap.getWidth() * bitMap.getHeight()];
