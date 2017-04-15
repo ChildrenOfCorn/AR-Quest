@@ -18,11 +18,7 @@ import java.nio.ByteOrder;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.util.Log;
-
-import com.vuforia.samples.ar.data.info.InfoTextureBuilder;
-import com.vuforia.samples.ar.data.models.ProductInfo;
 
 // Support class for the Vuforia samples applications.
 // Exposes functionality for loading a texture from the APK.
@@ -40,9 +36,10 @@ public class Texture
     boolean mReady = true;
 
     final static int CHROMA_KEY = -18751;
-    final static int TARGET_COLOR = 0xaf000000;
-    
-    
+    static byte CHROMA_ARRAY[] = {-1, -74, -63, -1};
+    static final int CHROMA_DOT = 9445;
+    static final int CHROMA_THRESHOLD = 1400;
+
     /* Factory function to load a texture from the APK. */
     public static Texture loadTextureFromApk(String fileName,
         AssetManager assets)
@@ -70,7 +67,11 @@ public class Texture
         }
     }
     
-    
+    public static int dot(byte one[], byte two[], int from) {
+        return one[from] * two[0] +one[from +1]*two[1]
+            +one[from+2]*two[2] + one[from+3]*two[3];
+    }
+
     public static Texture loadTextureFromIntBuffer(int[] data, int width,
         int height)
     {
@@ -81,13 +82,18 @@ public class Texture
         for (int p = 0; p < numPixels; ++p)
         {
             int colour = data[p];
-            if (colour == CHROMA_KEY) {
-                colour = TARGET_COLOR;
-            }
             dataBytes[p * 4] = (byte) (colour >>> 16); // R
             dataBytes[p * 4 + 1] = (byte) (colour >>> 8); // G
             dataBytes[p * 4 + 2] = (byte) colour; // B
-            dataBytes[p * 4 + 3] = (byte) (colour >>> 24); // A
+            dataBytes[p * 4 + 3] = (byte) (colour >>> 24);
+            int delta = Math.abs(dot(dataBytes, CHROMA_ARRAY, p * 4) - CHROMA_DOT);
+            if (delta < CHROMA_THRESHOLD) {
+                dataBytes[p*4] = 0;
+                dataBytes[p*4 + 1] = 0;
+                dataBytes[p*4 + 2] = 0;
+                dataBytes[p*4 + 3] = (byte) 200;
+
+            }
         }
         
         Texture texture = new Texture();

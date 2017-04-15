@@ -73,6 +73,7 @@ public class HtmlBitmapGenerator implements InfoTextureBuilder {
 						if (webClient.isPageLoaded()) {
 							final Canvas c = new Canvas(bitmap);
 							view.draw(c);
+
 							webView.setPictureListener(null);
 							if (listener != null) {
 								Texture texture = Texture.loadTextureFromBitmap(bitmap);

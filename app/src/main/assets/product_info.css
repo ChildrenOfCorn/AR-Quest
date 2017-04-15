@@ -1,5 +1,7 @@
 body {
     background-color: #ffb6c1;
+    color: #ffffff;
+   text-shadow: 0 0 #000;
 }
 
 .ratings {
