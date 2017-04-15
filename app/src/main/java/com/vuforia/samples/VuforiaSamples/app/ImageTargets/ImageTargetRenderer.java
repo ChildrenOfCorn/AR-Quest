@@ -41,6 +41,7 @@ import com.vuforia.samples.SampleApplication.utils.Texture;
 // The renderer class for the ImageTargets sample.
 public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRendererControl {
     private static final String LOGTAG = "ImageTargetRenderer";
+    public static final float PANEL_RIGHT_OFFSET = 0.2f;
 
     private SampleApplicationSession vuforiaAppSession;
     private ImageTargets mActivity;
@@ -200,22 +201,18 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
             // deal with the modelview and projection matrices
             float[] modelViewProjection = new float[16];
 
-            if (!mActivity.isExtendedTrackingActive()) {
-                Matrix.translateM(modelViewMatrix, 0, 0.0f, 0.0f,
-                        OBJECT_SCALE_FLOAT);
-                Matrix.scaleM(modelViewMatrix, 0, OBJECT_SCALE_FLOAT,
-                        OBJECT_SCALE_FLOAT, OBJECT_SCALE_FLOAT);
-            } else {
-                Matrix.rotateM(modelViewMatrix, 0, 90.0f, 1.0f, 0, 0);
-                Matrix.scaleM(modelViewMatrix, 0, kBuildingScale,
-                        kBuildingScale, kBuildingScale);
-            }
+            // поворот объекта относительно центра
+            Matrix.translateM(modelViewMatrix, 0, PANEL_RIGHT_OFFSET, 0.0f,
+                    OBJECT_SCALE_FLOAT);
+            Matrix.scaleM(modelViewMatrix, 0, OBJECT_SCALE_FLOAT,
+                    OBJECT_SCALE_FLOAT, OBJECT_SCALE_FLOAT);
+
             Matrix.multiplyMM(modelViewProjection, 0, projectionMatrix, 0, modelViewMatrix, 0);
 
             // activate the shader program and bind the vertex/normal/tex coords
             GLES20.glUseProgram(shaderProgramID);
 
-            if (!mActivity.isExtendedTrackingActive()) {
+            if (true/*mActivity.isExtendedTrackingActive()*/) {
                 GLES20.glVertexAttribPointer(vertexHandle, 3, GLES20.GL_FLOAT,
                         false, 0, panel.getVertices());
                 GLES20.glVertexAttribPointer(textureCoordHandle, 2,
@@ -242,12 +239,12 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
                 // disable the enabled arrays
                 GLES20.glDisableVertexAttribArray(vertexHandle);
                 GLES20.glDisableVertexAttribArray(textureCoordHandle);
-            } else {
+            } /*else {
                 GLES20.glDisable(GLES20.GL_CULL_FACE);
                 GLES20.glVertexAttribPointer(vertexHandle, 3, GLES20.GL_FLOAT,
-                        false, 0, mBuildingsModel.getVertices());
+                        false, 0, panel.getVertices());
                 GLES20.glVertexAttribPointer(textureCoordHandle, 2,
-                        GLES20.GL_FLOAT, false, 0, mBuildingsModel.getTexCoords());
+                        GLES20.GL_FLOAT, false, 0, panel.getTexCoords());
 
                 GLES20.glEnableVertexAttribArray(vertexHandle);
                 GLES20.glEnableVertexAttribArray(textureCoordHandle);
@@ -259,11 +256,11 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
                         modelViewProjection, 0);
                 GLES20.glUniform1i(texSampler2DHandle, 0);
                 GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0,
-                        mBuildingsModel.getNumObjectVertex());
+                        panel.getNumObjectVertex());
 
                 SampleUtils.checkGLError("Renderer DrawBuildings");
             }
-
+            */
             SampleUtils.checkGLError("Render Frame");
         }
 
