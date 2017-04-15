@@ -24,6 +24,7 @@ public class HtmlBitmapGenerator implements InfoTextureBuilder {
 
 	private WebView webView;
 	private OnTextureBuildListener listener;
+	private static final String BR = "<br>";
 
 	public HtmlBitmapGenerator() {
 		this.webView = new WebView(App.getAppContext());
@@ -31,13 +32,24 @@ public class HtmlBitmapGenerator implements InfoTextureBuilder {
 
 	String productInfoToHtml(final ProductInfo productInfo) {
 		StringBuilder builder = new StringBuilder(1024);
-		builder.append("<html><body><div style='font-size:2em'>")
+		builder.append("<html>")
+			.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"product_info.css\">")
+			.append("<body><div style='font-size:2em'>")
 			.append(productInfo.getName())
 			.append("</div>")
 			.append(productInfo.getBriefDesc());
 
+		if (productInfo.getRating() != ProductInfo.NO_RATING) {
+			builder.append(BR);
+			builder.append("<div class=\"ratings\">\n"
+							   + "    <div class=\"empty-stars\"></div>"
+							   + "    <div class=\"full-stars\" style=\"width:")
+				.append(productInfo.getRatingInPercents()+"%\"></div>"
+							   + "</div>");
+		}
+
 		if (productInfo.getComments() != null && productInfo.getComments().size() > 0) {
-			builder.append("<br>")
+			builder.append(BR)
 			.append("Комментариев: " + productInfo.getComments().size());
 		}
 		builder.append("</body></html>");
