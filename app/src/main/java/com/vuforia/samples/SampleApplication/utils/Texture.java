@@ -110,8 +110,11 @@ public class Texture
         bitMap.getPixels(data, 0, bitMap.getWidth(), 0, 0,
                 bitMap.getWidth(), bitMap.getHeight());
 
-        return loadTextureFromIntBuffer(data, bitMap.getWidth(),
+        Texture texture =  loadTextureFromIntBuffer(data, bitMap.getWidth(),
                 bitMap.getHeight());
+        texture.mReady = false;
+        return texture;
+
     }
 
     public static Texture loadTextureFromARGBBitmap(Bitmap bitMap) {

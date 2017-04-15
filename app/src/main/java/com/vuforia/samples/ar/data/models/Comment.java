@@ -7,6 +7,10 @@ import lombok.Data;
  */
 @Data
 public class Comment {
+    public Comment(final String text, final UserInfo owner) {
+        this.text = text;
+        this.owner = owner;
+    }
     private String text;
     private UserInfo owner;
 }
