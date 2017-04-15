@@ -44,12 +44,13 @@ import com.vuforia.samples.ar.data.models.ProductInfo;
 import com.vuforia.samples.ar.di.DiContainer;
 
 // The renderer class for the ImageTargets sample.
-public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRendererControl {
+public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRendererControl, InfoTextureBuilder.OnTextureBuildListener {
     private static final String LOGTAG = "ImageTargetRenderer";
     private static final float PANEL_RIGHT_OFFSET = 0.2f;
 
     private ProductInfoInteractor productInfoInteractor;
     private InfoTextureBuilder infoTextureBuilder;
+    private Texture prevTexture;
 
     private SampleApplicationSession vuforiaAppSession;
     private ImageTargets mActivity;
@@ -77,7 +78,8 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
     public ImageTargetRenderer(ImageTargets activity, SampleApplicationSession session) {
         productInfoInteractor = DiContainer.provideProductInfoInteractor();
         infoTextureBuilder = DiContainer.provideInfoTextureBuilder();
-
+        infoTextureBuilder.setTextureBuildListener(this);
+        
         mActivity = activity;
         vuforiaAppSession = session;
         // SampleAppRenderer used to encapsulate the use of RenderingPrimitives setting
@@ -198,9 +200,12 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
         for (int tIdx = 0; tIdx < state.getNumTrackableResults(); tIdx++) {
             TrackableResult result = state.getTrackableResult(tIdx);
             Trackable trackable = result.getTrackable();
-            Texture currentTexture = getTextureByObjectInfo((ObjectInfo) trackable.getUserData());
+            getTextureByObjectInfo((ObjectInfo) trackable.getUserData());
 
-            printUserData(trackable);
+            if (prevTexture == null) {
+                continue;
+            }
+
             Matrix44F modelViewMatrix_Vuforia = Tool
                     .convertPose2GLMatrix(result.getPose());
             float[] modelViewMatrix = modelViewMatrix_Vuforia.getData();
@@ -229,7 +234,7 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
 
             // activate texture 0, bind it, and pass to shader
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, currentTexture.mTextureID[0]);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, prevTexture.mTextureID[0]);
             GLES20.glUniform1i(texSampler2DHandle, 0);
 
             // pass the model view matrix to the shader
@@ -251,18 +256,21 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
         GLES20.glDisable(GLES20.GL_DEPTH_TEST);
     }
 
-    private void printUserData(Trackable trackable) {
-        ObjectInfo userData = (ObjectInfo) trackable.getUserData();
-        Log.d(LOGTAG, "UserData:Retreived User Data	\"" + userData + "\"");
-    }
-
     public void setTextures(Vector<Texture> textures) {
         mTextures = textures;
     }
 
     private Texture getTextureByObjectInfo(ObjectInfo objectInfo) {
         ProductInfo productInfo = productInfoInteractor.getProductInfoByTargetId(objectInfo.getId());
-        Texture texture = infoTextureBuilder.getTextureBitmapFromInfo(productInfo);
-        return texture;
+        if (productInfo != null) {
+            Log.d(LOGTAG, "UserData:Retreived User Data	\"" + productInfo + "\"");
+            infoTextureBuilder.getTextureBitmapFromInfo(productInfo);
+        }
+        return prevTexture;
+    }
+
+    @Override
+    public void onTextureReady(Texture texture) {
+        prevTexture = texture;
     }
 }

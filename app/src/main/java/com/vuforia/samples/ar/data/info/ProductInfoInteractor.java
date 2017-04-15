@@ -1,5 +1,7 @@
 package com.vuforia.samples.ar.data.info;
 
+import android.support.annotation.Nullable;
+
 import com.vuforia.samples.ar.data.models.ProductInfo;
 
 /**
@@ -8,5 +10,6 @@ import com.vuforia.samples.ar.data.models.ProductInfo;
  */
 
 public interface ProductInfoInteractor {
+    @Nullable
     ProductInfo getProductInfoByTargetId(long recognizedTargetId);
 }

@@ -21,4 +21,13 @@ public class ProductInfo {
     public ProductInfo(long id) {
         this.id = id;
     }
+
+    @Override
+    public String toString() {
+        return "ProductInfo{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", url='" + url + '\'' +
+                '}';
+    }
 }

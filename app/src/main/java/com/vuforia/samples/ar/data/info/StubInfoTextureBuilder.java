@@ -2,9 +2,12 @@ package com.vuforia.samples.ar.data.info;
 
 import android.content.res.AssetManager;
 import android.opengl.GLES20;
+import android.support.annotation.Nullable;
 
 import com.vuforia.samples.SampleApplication.utils.Texture;
 import com.vuforia.samples.ar.data.models.ProductInfo;
+
+import lombok.NonNull;
 
 /**
  * Created by grishberg on 15.04.17.
@@ -13,13 +16,15 @@ import com.vuforia.samples.ar.data.models.ProductInfo;
 public class StubInfoTextureBuilder implements InfoTextureBuilder {
     private final AssetManager assetManager;
 
+    @Nullable
+    private OnTextureBuildListener onTextureBuildListener;
 
     public StubInfoTextureBuilder(AssetManager assetManager) {
         this.assetManager = assetManager;
     }
 
     @Override
-    public Texture getTextureBitmapFromInfo(ProductInfo productInfo) {
+    public void getTextureBitmapFromInfo(@NonNull ProductInfo productInfo) {
         Texture texture = null;
         switch ((int) productInfo.getId()) {
             case 1:
@@ -33,7 +38,14 @@ public class StubInfoTextureBuilder implements InfoTextureBuilder {
                 break;
         }
         initTexture(texture);
-        return texture;
+        if (onTextureBuildListener != null) {
+            onTextureBuildListener.onTextureReady(texture);
+        }
+    }
+
+    @Override
+    public void setTextureBuildListener(OnTextureBuildListener onTextureBuildListener) {
+        this.onTextureBuildListener = onTextureBuildListener;
     }
 
     private void initTexture(Texture texture) {
