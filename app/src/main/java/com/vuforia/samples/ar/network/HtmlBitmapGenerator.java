@@ -31,11 +31,16 @@ public class HtmlBitmapGenerator implements InfoTextureBuilder {
 
 	String productInfoToHtml(final ProductInfo productInfo) {
 		StringBuilder builder = new StringBuilder(1024);
-		builder.append("<html><body><h2>")
+		builder.append("<html><body><div style='font-size:2em'>")
 			.append(productInfo.getName())
-			.append("</h2><br>")
-			.append(productInfo.getBriefDesc())
-			.append("</body></html>");
+			.append("</div>")
+			.append(productInfo.getBriefDesc());
+
+		if (productInfo.getComments() != null && productInfo.getComments().size() > 0) {
+			builder.append("<br>")
+			.append("Комментариев: " + productInfo.getComments().size());
+		}
+		builder.append("</body></html>");
 		return builder.toString();
 	}
 
@@ -43,13 +48,12 @@ public class HtmlBitmapGenerator implements InfoTextureBuilder {
 		final SimpleWebClient webClient = new SimpleWebClient();
 		final Bitmap bitmap = Bitmap.createBitmap(containerWidth, containerHeight, Bitmap.Config.ARGB_8888);
 
-
 		new Handler(App.getAppContext().getMainLooper()).post(new Runnable() {
 			@Override
 			public void run() {
 				webView.setWebViewClient(webClient);
-				webView.layout(0, 0, containerWidth, containerHeight);
-				webView.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
+				webView.layout(0, 0, 800, 800);
+				webView.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null);
 
 				webView.setPictureListener(new WebView.PictureListener() {
 					@Override
@@ -59,7 +63,7 @@ public class HtmlBitmapGenerator implements InfoTextureBuilder {
 							view.draw(c);
 							webView.setPictureListener(null);
 							if (listener != null) {
-								Texture texture = Texture.loadTextureFromARGBBitmap(bitmap);//
+								Texture texture = Texture.loadTextureFromBitmap(bitmap);
 								listener.onTextureReady(texture);
 							}
 						}
@@ -67,9 +71,6 @@ public class HtmlBitmapGenerator implements InfoTextureBuilder {
 				});
 			}
 		});
-
-
-
 	}
 
 	@Override
@@ -82,18 +83,18 @@ public class HtmlBitmapGenerator implements InfoTextureBuilder {
 		this.listener = onTextureBuildListener;
 	}
 
-class SimpleWebClient extends WebViewClient {
+	class SimpleWebClient extends WebViewClient {
 
-	boolean pageLoaded = false;
+		boolean pageLoaded = false;
 
-	boolean isPageLoaded() {
-		return pageLoaded;
+		boolean isPageLoaded() {
+			return pageLoaded;
+		}
+
+		@Override
+		public void onPageFinished(final WebView view, final String url) {
+			super.onPageFinished(view, url);
+			pageLoaded = true;
+		}
 	}
-
-	@Override
-	public void onPageFinished(final WebView view, final String url) {
-		super.onPageFinished(view, url);
-		pageLoaded = true;
-	}
-}
 }
