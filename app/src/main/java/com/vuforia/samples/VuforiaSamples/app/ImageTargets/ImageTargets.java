@@ -382,7 +382,7 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
                 Log.e(LOGTAG, "Unable to enable continuous autofocus");
 
             mSampleAppMenu = new SampleAppMenu(this, this, "Image Targets",
-                mGlView, mUILayout, null);
+                    mGlView, mUILayout, null);
             startExtendedTracking();
             setSampleAppMenuSettings();
         } else {
@@ -527,8 +527,7 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
 
         group = mSampleAppMenu.addGroup("", true);
         group.addSelectionItem(getString(R.string.menu_extended_tracking),
-                CMD_EXTENDED_TRACKING, false);
-            CMD_EXTENDED_TRACKING, true);
+                CMD_EXTENDED_TRACKING, true);
         group.addSelectionItem(getString(R.string.menu_contAutofocus),
                 CMD_AUTOFOCUS, mContAutofocus);
         mFlashOptionView = group.addSelectionItem(
@@ -567,36 +566,28 @@ public class ImageTargets extends Activity implements SampleApplicationControl,
         mSampleAppMenu.attachMenu();
     }
 
-
     boolean startExtendedTracking() {
         boolean result = true;
-        for (int tIdx = 0; tIdx < mCurrentDataset.getNumTrackables(); tIdx++)
-        {
+        for (int tIdx = 0; tIdx < mCurrentDataset.getNumTrackables(); tIdx++) {
             Trackable trackable = mCurrentDataset.getTrackable(tIdx);
 
-            if (!mExtendedTracking)
-            {
-                if (!trackable.startExtendedTracking())
-                {
+            if (!mExtendedTracking) {
+                if (!trackable.startExtendedTracking()) {
                     Log.e(LOGTAG,
-                          "Failed to start extended tracking target");
+                            "Failed to start extended tracking target");
                     result = false;
-                } else
-                {
+                } else {
                     Log.d(LOGTAG,
-                          "Successfully started extended tracking target");
+                            "Successfully started extended tracking target");
                 }
-            } else
-            {
-                if (!trackable.stopExtendedTracking())
-                {
+            } else {
+                if (!trackable.stopExtendedTracking()) {
                     Log.e(LOGTAG,
-                          "Failed to stop extended tracking target");
+                            "Failed to stop extended tracking target");
                     result = false;
-                } else
-                {
+                } else {
                     Log.d(LOGTAG,
-                          "Successfully started extended tracking target");
+                            "Successfully started extended tracking target");
                 }
             }
         }
