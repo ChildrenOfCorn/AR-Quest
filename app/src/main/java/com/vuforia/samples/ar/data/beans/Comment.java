@@ -9,10 +9,13 @@ import lombok.Data;
  */
 @Data
 public class Comment implements Serializable{
+    private String text;
+    private UserInfo owner;
+    private float rating;
+
     public Comment(final String text, final UserInfo owner) {
         this.text = text;
         this.owner = owner;
     }
-    private String text;
-    private UserInfo owner;
+
 }
