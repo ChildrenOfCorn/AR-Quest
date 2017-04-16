@@ -11,6 +11,8 @@ import com.vuforia.samples.ar.repository.AuthTokenRepository;
 import com.vuforia.samples.ar.repository.AuthTokenRepositoryImpl;
 import com.vuforia.samples.ar.repository.auth.AuthRepository;
 import com.vuforia.samples.ar.repository.auth.AuthRepositoryImpl;
+import com.vuforia.samples.ar.repository.info.ProductInfoRepository;
+import com.vuforia.samples.ar.repository.info.InfoRepositoryImpl;
 import com.vuforia.samples.ar.rest.Api;
 import com.vuforia.samples.ar.rest.ErrorCheckerImpl;
 
@@ -108,5 +110,11 @@ public class RestModule {
     @Singleton
     AuthRepository provideAuthRepository(final Api api, final AuthTokenRepository authRepository) {
         return new AuthRepositoryImpl(api, authRepository);
+    }
+
+    @Provides
+    @Singleton
+    ProductInfoRepository provideInfoRepository(final Api api, final AuthTokenRepository authRepository) {
+        return new InfoRepositoryImpl(api, authRepository);
     }
 }
