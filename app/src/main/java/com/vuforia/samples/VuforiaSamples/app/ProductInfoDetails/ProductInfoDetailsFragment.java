@@ -8,11 +8,22 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.vuforia.samples.VuforiaSamples.R;
 import com.vuforia.samples.VuforiaSamples.app.ImageTargets.adapters.CommentRecyclerAdapter;
+import com.vuforia.samples.ar.data.beans.Comment;
 import com.vuforia.samples.ar.data.beans.ProductInfo;
+import com.vuforia.samples.ar.data.beans.UserInfo;
+import com.vuforia.samples.ar.di.DiContainer;
+import com.vuforia.samples.ar.repository.AuthTokenRepository;
+import com.vuforia.samples.ar.repository.SimpleCallback;
+import com.vuforia.samples.ar.repository.info.ProductInfoRepository;
+
+import javax.inject.Inject;
 
 /**
  * Date: 4/16/17
@@ -21,9 +32,23 @@ import com.vuforia.samples.ar.data.beans.ProductInfo;
  * @author Andrey Smolyak
  */
 
-public class ProductInfoDetailsFragment extends Fragment {
+public class ProductInfoDetailsFragment extends Fragment implements SimpleCallback<Float> {
 
 	private static final String PRODUCT_INFO_TAG = "product_info";
+	ProductInfo productInfo;
+	TextView productNameTextView;
+	RecyclerView recyclerView;
+	Button postCommentButton;
+	EditText commentEditText;
+	RatingBar ratingBar;
+	boolean postInProgress = false;
+	CommentRecyclerAdapter commentsAdapter;
+
+	@Inject
+	ProductInfoRepository productInfoRepository;
+
+	@Inject
+	AuthTokenRepository authTokenRepository;
 
 	public static ProductInfoDetailsFragment newInstance(final ProductInfo productInfo) {
 		ProductInfoDetailsFragment fragment = new ProductInfoDetailsFragment();
@@ -35,27 +60,59 @@ public class ProductInfoDetailsFragment extends Fragment {
 		return fragment;
 	}
 
-	ProductInfo productInfo;
-	TextView productNameTextView;
-	RecyclerView recyclerView;
-
 	@Nullable
 	@Override
 	public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
 							 @Nullable final Bundle savedInstanceState) {
 
+		DiContainer.getAppComponent().inject(this);
 
 		this.productInfo = (ProductInfo) getArguments().getSerializable(PRODUCT_INFO_TAG);
 		View rootView = inflater.inflate(R.layout.product_details, null);
 		productNameTextView = (TextView) rootView.findViewById(R.id.product_details_product_name);
 		productNameTextView.setText(productInfo.getName());
+		postCommentButton = (Button) rootView.findViewById(R.id.product_details_addCommentButton);
+		commentEditText = (EditText) rootView.findViewById(R.id.product_details_addCommentEditText);
+		ratingBar = (RatingBar) rootView.findViewById(R.id.product_details_ratingBar);
 
 		recyclerView = (RecyclerView) rootView.findViewById(R.id.product_details_recycler_view);
 		recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-		CommentRecyclerAdapter adapter = new CommentRecyclerAdapter();
-		adapter.setComments(productInfo.getComments());
-		recyclerView.setAdapter(adapter);
+		commentsAdapter = new CommentRecyclerAdapter();
+		commentsAdapter.setComments(productInfo.getComments());
+		recyclerView.setAdapter(commentsAdapter);
+
+		postCommentButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				if (commentEditText.getText().length() > 0) {
+					postInProgress = true;
+					productInfoRepository.postComment(productInfo.getId(),
+													  commentEditText.getText().toString(),
+													  ratingBar.getRating(),
+													  ProductInfoDetailsFragment.this);
+					commentEditText.setEnabled(false);
+
+				}
+			}
+		});
 
 		return rootView;
+	}
+
+	@Override
+	public void onSuccess(final Float rating) {
+		postInProgress = false;
+		UserInfo userInfo = new UserInfo(0, authTokenRepository.getLogin());
+		Comment comment = new Comment(commentEditText.getText().toString(), userInfo);
+		commentsAdapter.addComment(comment);
+		commentEditText.setText("");
+		commentEditText.setEnabled(true);
+
+	}
+
+	@Override
+	public void onFail(final Throwable error) {
+		postInProgress = false;
+		commentEditText.setEnabled(true);
 	}
 }
