@@ -202,7 +202,8 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
             TrackableResult result = state.getTrackableResult(tIdx);
             Trackable trackable = result.getTrackable();
 
-            getTextureByObjectInfoIfRequired((ObjectInfo) trackable.getUserData());
+            ObjectInfo userData = (ObjectInfo) trackable.getUserData();
+            getTextureByObjectInfoIfRequired(userData);
 
             if (prevTexture == null) {
                 continue;
@@ -278,7 +279,7 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
 
         lastTargetId = targetId;
 
-        Log.d(TAG, "Current product info was reset");
+        Log.d(TAG, "Current product info was reset, lastTargetId = " + lastTargetId);
         currentProductInfo = null;
         prevTexture = null;
 
