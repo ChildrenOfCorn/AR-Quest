@@ -13,9 +13,10 @@ public class Comment implements Serializable{
     private UserInfo owner;
     private float rating;
 
-    public Comment(final String text, final UserInfo owner) {
+    public Comment(final String text, final UserInfo owner, final float rating) {
         this.text = text;
         this.owner = owner;
+        this.rating = rating;
     }
 
 }

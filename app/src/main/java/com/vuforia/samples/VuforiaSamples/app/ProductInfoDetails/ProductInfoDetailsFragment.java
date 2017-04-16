@@ -40,7 +40,8 @@ public class ProductInfoDetailsFragment extends Fragment implements SimpleCallba
 	RecyclerView recyclerView;
 	Button postCommentButton;
 	EditText commentEditText;
-	RatingBar ratingBar;
+	RatingBar commonRatingBar;
+	RatingBar commentRatingBar;
 	boolean postInProgress = false;
 	CommentRecyclerAdapter commentsAdapter;
 
@@ -73,13 +74,16 @@ public class ProductInfoDetailsFragment extends Fragment implements SimpleCallba
 		productNameTextView.setText(productInfo.getName());
 		postCommentButton = (Button) rootView.findViewById(R.id.product_details_addCommentButton);
 		commentEditText = (EditText) rootView.findViewById(R.id.product_details_addCommentEditText);
-		ratingBar = (RatingBar) rootView.findViewById(R.id.product_details_ratingBar);
+		commonRatingBar = (RatingBar) rootView.findViewById(R.id.product_details_ratingBar);
+		commentRatingBar = (RatingBar) rootView.findViewById(R.id.product_details_addCommentRating);
 
 		recyclerView = (RecyclerView) rootView.findViewById(R.id.product_details_recycler_view);
 		recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 		commentsAdapter = new CommentRecyclerAdapter();
 		commentsAdapter.setComments(productInfo.getComments());
 		recyclerView.setAdapter(commentsAdapter);
+
+		commonRatingBar.setRating(productInfo.getRating());
 
 		postCommentButton.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -88,9 +92,10 @@ public class ProductInfoDetailsFragment extends Fragment implements SimpleCallba
 					postInProgress = true;
 					productInfoRepository.postComment(productInfo.getId(),
 													  commentEditText.getText().toString(),
-													  ratingBar.getRating(),
+													  commentRatingBar.getRating(),
 													  ProductInfoDetailsFragment.this);
 					commentEditText.setEnabled(false);
+					commentRatingBar.setEnabled(false);
 
 				}
 			}
@@ -103,10 +108,15 @@ public class ProductInfoDetailsFragment extends Fragment implements SimpleCallba
 	public void onSuccess(final Float rating) {
 		postInProgress = false;
 		UserInfo userInfo = new UserInfo(0, authTokenRepository.getLogin());
-		Comment comment = new Comment(commentEditText.getText().toString(), userInfo);
+		Comment comment = new Comment(commentEditText.getText().toString(), userInfo, commentRatingBar.getRating());
 		commentsAdapter.addComment(comment);
+
 		commentEditText.setText("");
+		commentRatingBar.setRating(0);
+
 		commentEditText.setEnabled(true);
+		commentRatingBar.setEnabled(true);
+		commonRatingBar.setRating(rating);
 
 	}
 
