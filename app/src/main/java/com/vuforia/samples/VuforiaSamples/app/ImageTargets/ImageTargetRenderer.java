@@ -10,7 +10,6 @@ countries.
 package com.vuforia.samples.VuforiaSamples.app.ImageTargets;
 
 import java.io.IOException;
-import java.util.Vector;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -42,18 +41,20 @@ import com.vuforia.samples.ar.data.info.ProductInfoInteractor;
 import com.vuforia.samples.ar.data.beans.ObjectInfo;
 import com.vuforia.samples.ar.data.beans.ProductInfo;
 import com.vuforia.samples.ar.di.DiContainer;
+import com.vuforia.samples.ar.repository.SimpleCallback;
 
 import lombok.Getter;
 
 // The renderer class for the ImageTargets sample.
 public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRendererControl,
-        InfoTextureBuilder.OnTextureBuildListener, ProductInfoInteractor.OnProductReceivedListener {
+        ProductInfoInteractor.OnProductReceivedListener {
     private static final String TAG = "ImageTargetRenderer";
     private static final float PANEL_RIGHT_OFFSET = 0.2f;
 
     private ProductInfoInteractor productInfoInteractor;
     private InfoTextureBuilder infoTextureBuilder;
-    private Texture prevTexture;
+    private TextureManager textureManager;
+    private ProductInfoManager productInfoManager;
 
     private SampleApplicationSession vuforiaAppSession;
     private ImageTargets mActivity;
@@ -69,8 +70,7 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
     private long lastTargetId = -1;
 
     @Getter
-    private ProductInfo currentProductInfo;
-    private ProductInfo lastProductInfo;
+    private ProductInfo currentProductInfo; // последняя инфа о продукте
 
     private float kBuildingScale = 0.012f;
     private SampleApplication3DModel mBuildingsModel;
@@ -85,7 +85,8 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
         productInfoInteractor = DiContainer.provideProductInfoInteractor();
         productInfoInteractor.setOnProductReceivedListener(this);
         infoTextureBuilder = DiContainer.provideInfoTextureBuilder();
-        infoTextureBuilder.setTextureBuildListener(this);
+        textureManager = new TextureManager();
+        productInfoManager = new ProductInfoManager();
 
         mActivity = activity;
         vuforiaAppSession = session;
@@ -197,18 +198,23 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
         boolean objectinfoRequested = false;
 
         // Did we find any trackables this frame?
+        textureManager.updateOldTextures(state);
+        productInfoManager.updateOldTextures(state);
+
         for (int tIdx = 0; tIdx < state.getNumTrackableResults(); tIdx++) {
             objectinfoRequested = true;
             TrackableResult result = state.getTrackableResult(tIdx);
             Trackable trackable = result.getTrackable();
 
-            getTextureByObjectInfoIfRequired((ObjectInfo) trackable.getUserData());
+            ObjectInfo objectInfo = (ObjectInfo) trackable.getUserData();
+            getTextureByObjectInfoIfRequired(objectInfo);
 
-            if (prevTexture == null) {
+            Texture currentTexture = textureManager.getTexture(objectInfo);
+            if (currentTexture == null) {
                 continue;
             }
-            if (!prevTexture.isReady()) {
-                initTexture(prevTexture);
+            if (!currentTexture.isReady()) {
+                initTexture(currentTexture);
             }
 
             Matrix44F modelViewMatrix_Vuforia = Tool
@@ -239,7 +245,7 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
 
             // activate texture 0, bind it, and pass to shader
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, prevTexture.mTextureID[0]);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, currentTexture.mTextureID[0]);
             GLES20.glUniform1i(texSampler2DHandle, 0);
 
             // pass the model view matrix to the shader
@@ -261,7 +267,6 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
         if (!objectinfoRequested) {
             lastTargetId = -1;
             currentProductInfo = null;
-            prevTexture = null;
         }
 
         GLES20.glDisable(GLES20.GL_BLEND);
@@ -270,19 +275,12 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
 
     private void getTextureByObjectInfoIfRequired(ObjectInfo objectInfo) {
         long targetId = objectInfo.getId();
-
-        if (targetId == lastTargetId) {
-            currentProductInfo = lastProductInfo;
+        //TODO множественное распознование не оч работает
+        if (!productInfoManager.checkProductInfo(objectInfo)) {
+            Log.d(TAG, "productInfoForObject == null");
+            productInfoInteractor.getProductInfoByTargetId(targetId);
             return;
         }
-
-        lastTargetId = targetId;
-
-        Log.d(TAG, "Current product info was reset");
-        currentProductInfo = null;
-        prevTexture = null;
-
-        productInfoInteractor.getProductInfoByTargetId(targetId);
     }
 
     private void initTexture(final Texture texture) {
@@ -302,15 +300,20 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
     public void onProductInfoReceived(@NonNull ProductInfo productInfo) {
         Log.d(TAG, "UserData:Retrieved User Data	\"" + productInfo + "\"");
 
+        productInfoManager.putProductInfo(productInfo.getId(), productInfo);
         this.currentProductInfo = productInfo;
-        this.lastProductInfo = productInfo;
 
-        infoTextureBuilder.getTextureBitmapFromInfo(productInfo);
-    }
+        infoTextureBuilder.getTextureBitmapFromInfo(productInfo, new SimpleCallback<Texture>() {
+            @Override
+            public void onSuccess(Texture result) {
+                Log.d(TAG, "onTextureReady: texture = " + result);
+                textureManager.putTexture(productInfo.getId(), result);
+            }
 
-    @Override
-    public void onTextureReady(Texture texture) {
-        Log.d(TAG, "onTextureReady: texture = " + texture);
-        prevTexture = texture;
+            @Override
+            public void onFail(Throwable error) {
+                Log.e(TAG, "onFail: ", error);
+            }
+        });
     }
 }

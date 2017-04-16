@@ -11,6 +11,9 @@ import com.vuforia.samples.App;
 import com.vuforia.samples.SampleApplication.utils.Texture;
 import com.vuforia.samples.ar.data.info.InfoTextureBuilder;
 import com.vuforia.samples.ar.data.beans.ProductInfo;
+import com.vuforia.samples.ar.repository.SimpleCallback;
+
+import lombok.NonNull;
 
 /**
  * Date: 15.04.17 Time: 14:10
@@ -20,107 +23,102 @@ import com.vuforia.samples.ar.data.beans.ProductInfo;
 
 public class HtmlBitmapGenerator implements InfoTextureBuilder {
 
-	private static final int container_size = 500;
-	private static final String BR = "<br>";
-	private WebView webView;
-	private OnTextureBuildListener listener;
+    private static final int container_size = 500;
+    private static final String BR = "<br>";
+    private WebView webView;
+    private SimpleCallback<Texture> callback;
 
-	public HtmlBitmapGenerator() {
-		this.webView = new WebView(App.getAppContext());
-	}
+    public HtmlBitmapGenerator() {
+        this.webView = new WebView(App.getAppContext());
+    }
 
-	String productInfoToHtml(final ProductInfo productInfo) {
-		StringBuilder builder = new StringBuilder(1024);
-		builder.append("<html>")
-			.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"product_info.css\">")
-			.append("<body><div style='font-size:2em;'>")
-			.append(productInfo.getName())
-			.append("</div>")
-			.append(productInfo.getBriefDesc());
+    String productInfoToHtml(final ProductInfo productInfo) {
+        StringBuilder builder = new StringBuilder(1024);
+        builder.append("<html>")
+                .append("<link rel=\"stylesheet\" type=\"text/css\" href=\"product_info.css\">")
+                .append("<body><div style='font-size:2em;'>")
+                .append(productInfo.getName())
+                .append("</div>")
+                .append(productInfo.getBriefDesc());
 
-		if (productInfo.getRating() != ProductInfo.NO_RATING) {
+        if (productInfo.getRating() != ProductInfo.NO_RATING) {
 
-			builder.append(BR);
-			builder.append("<div class=\"ratings\">\n"
-							   + "    <div class=\"empty-stars\"></div>"
-							   + "    <div class=\"full-stars\" style=\"width:")
-				.append(productInfo.getRatingInPercents() + "%\">")
-				.append("</div>")
-				.append("</div>");
-		}
+            builder.append(BR);
+            builder.append("<div class=\"ratings\">\n"
+                    + "    <div class=\"empty-stars\"></div>"
+                    + "    <div class=\"full-stars\" style=\"width:")
+                    .append(productInfo.getRatingInPercents() + "%\">")
+                    .append("</div>")
+                    .append("</div>");
+        }
 
-		if (productInfo.getComments() != null && productInfo.getComments().size() > 0) {
-			builder
-				.append("<div style='font-size:0.9em;'>Комментариев: " + productInfo.getComments().size())
-				.append("<img src='next.png' style='float:right;' width='12' height='20' style='padding-right:8px;'/>")
-				.append("</div>");
+        if (productInfo.getComments() != null && productInfo.getComments().size() > 0) {
+            builder
+                    .append("<div style='font-size:0.9em;'>Комментариев: " + productInfo.getComments().size())
+                    .append("<img src='next.png' style='float:right;' width='12' height='20' style='padding-right:8px;'/>")
+                    .append("</div>");
+        }
 
-		}
+        if (productInfo.getUrl() != null) {
+            builder
+                    .append(BR)
+                    .append("<div style='font-size:0.9em;'>Подробнее: ")
+                    .append("<img src='next.png' style='float:right;' width='12' height='20' style='padding-right:8px;'/>")
+                    .append("</div>");
+        }
 
-		if (productInfo.getUrl() != null) {
-			builder
-				.append(BR)
-				.append("<div style='font-size:0.9em;'>Подробнее: ")
-				.append("<img src='next.png' style='float:right;' width='12' height='20' style='padding-right:8px;'/>")
-				.append("</div>");
-		}
+        builder.append("</body></html>");
+        return builder.toString();
+    }
 
-		builder.append("</body></html>");
-		return builder.toString();
-	}
+    public void generate(final int containerWidth, final int containerHeight, final String html) {
+        final SimpleWebClient webClient = new SimpleWebClient();
+        final Bitmap bitmap = Bitmap.createBitmap(containerWidth, containerHeight, Bitmap.Config.ARGB_8888);
 
-	public void generate(final int containerWidth, final int containerHeight, final String html) {
-		final SimpleWebClient webClient = new SimpleWebClient();
-		final Bitmap bitmap = Bitmap.createBitmap(containerWidth, containerHeight, Bitmap.Config.ARGB_8888);
+        new Handler(App.getAppContext().getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                webView.setWebViewClient(webClient);
+                webView.layout(0, 0, container_size, container_size);
+                webView.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null);
 
-		new Handler(App.getAppContext().getMainLooper()).post(new Runnable() {
-			@Override
-			public void run() {
-				webView.setWebViewClient(webClient);
-				webView.layout(0, 0, container_size, container_size);
-				webView.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null);
+                webView.setPictureListener(new WebView.PictureListener() {
+                    @Override
+                    public void onNewPicture(WebView view, Picture picture) {
+                        if (webClient.isPageLoaded()) {
+                            final Canvas c = new Canvas(bitmap);
+                            view.draw(c);
 
-				webView.setPictureListener(new WebView.PictureListener() {
-					@Override
-					public void onNewPicture(WebView view, Picture picture) {
-						if (webClient.isPageLoaded()) {
-							final Canvas c = new Canvas(bitmap);
-							view.draw(c);
+                            webView.setPictureListener(null);
+                            if (callback != null) {
+                                Texture texture = Texture.loadTextureFromBitmap(bitmap);
+                                callback.onSuccess(texture);
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    }
 
-							webView.setPictureListener(null);
-							if (listener != null) {
-								Texture texture = Texture.loadTextureFromBitmap(bitmap);
-								listener.onTextureReady(texture);
-							}
-						}
-					}
-				});
-			}
-		});
-	}
+    @Override
+    public void getTextureBitmapFromInfo(@NonNull final ProductInfo productInfo, SimpleCallback<Texture> callback) {
+        this.callback = callback;
+        generate(container_size, container_size, productInfoToHtml(productInfo));
+    }
 
-	@Override
-	public void getTextureBitmapFromInfo(final ProductInfo productInfo) {
-		generate(container_size, container_size, productInfoToHtml(productInfo));
-	}
+    class SimpleWebClient extends WebViewClient {
 
-	@Override
-	public void setTextureBuildListener(final OnTextureBuildListener onTextureBuildListener) {
-		this.listener = onTextureBuildListener;
-	}
+        boolean pageLoaded = false;
 
-	class SimpleWebClient extends WebViewClient {
+        boolean isPageLoaded() {
+            return pageLoaded;
+        }
 
-		boolean pageLoaded = false;
-
-		boolean isPageLoaded() {
-			return pageLoaded;
-		}
-
-		@Override
-		public void onPageFinished(final WebView view, final String url) {
-			super.onPageFinished(view, url);
-			pageLoaded = true;
-		}
-	}
+        @Override
+        public void onPageFinished(final WebView view, final String url) {
+            super.onPageFinished(view, url);
+            pageLoaded = true;
+        }
+    }
 }

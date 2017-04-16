@@ -10,6 +10,7 @@ import com.vuforia.samples.ar.data.beans.ProductInfo;
  */
 
 public interface ProductInfoInteractor {
+
     void getProductInfoByTargetId(long recognizedTargetId);
 
     void setOnProductReceivedListener(OnProductReceivedListener listener);

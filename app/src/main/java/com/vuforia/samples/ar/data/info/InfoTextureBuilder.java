@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.vuforia.samples.SampleApplication.utils.Texture;
 import com.vuforia.samples.ar.data.beans.ProductInfo;
+import com.vuforia.samples.ar.repository.SimpleCallback;
 
 /**
  * Created by grishberg on 15.04.17.
@@ -11,10 +12,5 @@ import com.vuforia.samples.ar.data.beans.ProductInfo;
  */
 
 public interface InfoTextureBuilder {
-    void getTextureBitmapFromInfo(@NonNull ProductInfo productInfo);
-    void setTextureBuildListener(OnTextureBuildListener onTextureBuildListener);
-
-    interface OnTextureBuildListener {
-        void onTextureReady(Texture texture);
-    }
+    void getTextureBitmapFromInfo(@NonNull ProductInfo productInfo, SimpleCallback<Texture> callback);
 }

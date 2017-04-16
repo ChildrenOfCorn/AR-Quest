@@ -37,6 +37,7 @@ import android.widget.Toast;
 
 import com.vuforia.CameraDevice;
 import com.vuforia.DataSet;
+import com.vuforia.HINT;
 import com.vuforia.ObjectTracker;
 import com.vuforia.State;
 import com.vuforia.STORAGE_TYPE;
@@ -151,7 +152,6 @@ public class ImageTargets extends Activity implements SampleApplicationControl, 
                     Log.e("SingleTapUp", "Unable to trigger focus");
             }
         }, 1000L);
-
     }
 
     // We want to load specific textures from the APK, which we will later use
@@ -287,6 +287,7 @@ public class ImageTargets extends Activity implements SampleApplicationControl, 
     @Override
     public boolean doLoadTrackersData() {
         TrackerManager tManager = TrackerManager.getInstance();
+        Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, 10);
         ObjectTracker objectTracker = (ObjectTracker) tManager
                 .getTracker(ObjectTracker.getClassType());
         if (objectTracker == null)
