@@ -13,6 +13,7 @@
         <item name="windowNoTitle">true</item>
         <item name="android:windowBackground">@color/black</item>
         <item name="android:textColor">#e0e0e0</item>
+        <item name="colorButtonNormal">#000000</item>
     </style>
 
     <style name="SampleAppsTheme" parent="@android:style/Theme.Light.NoTitleBar.Fullscreen">
