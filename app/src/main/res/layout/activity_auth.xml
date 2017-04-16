@@ -44,6 +44,7 @@
                 android:hint="@string/auth_login_hint"
                 android:inputType="text|textEmailAddress"
                 android:maxLength="16"
+                android:textColor="@android:color/white"
                 android:textSize="@dimen/auth_login_text_size"/>
 
         </android.support.design.widget.TextInputLayout>
