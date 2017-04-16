@@ -1,4 +1,4 @@
-package com.vuforia.samples.ar.data.models;
+package com.vuforia.samples.ar.data.beans;
 
 /**
  * Created by grishberg on 15.04.17.

@@ -4,6 +4,7 @@ import com.vuforia.samples.App;
 import com.vuforia.samples.ar.data.info.InfoTextureBuilder;
 import com.vuforia.samples.ar.data.info.ProductInfoInteractor;
 import com.vuforia.samples.ar.data.info.ProductInfoInteractorStub;
+import com.vuforia.samples.ar.di.components.AppComponent;
 import com.vuforia.samples.ar.network.HtmlBitmapGenerator;
 
 /**
@@ -20,4 +21,14 @@ public class DiContainer {
         //return new StubInfoTextureBuilder(App.getAppContext().getAssets());
         return new HtmlBitmapGenerator();
     }
+    private static AppComponent appComponent;
+
+    public static void initComponents(final AppComponent component) {
+        appComponent = component;
+    }
+
+    public static AppComponent getAppComponent() {
+        return appComponent;
+    }
+
 }

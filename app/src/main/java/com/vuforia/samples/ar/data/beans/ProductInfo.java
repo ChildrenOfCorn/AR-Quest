@@ -1,4 +1,4 @@
-package com.vuforia.samples.ar.data.models;
+package com.vuforia.samples.ar.data.beans;
 
 import java.util.List;
 

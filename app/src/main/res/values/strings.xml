@@ -69,5 +69,9 @@
     <string name="splash_screen_description">Vuforia Splash</string>
 
     <string name="API_KEY">AYgw9+//////AAAAGZpDscun5EZevsFx2Mm58VseFOD5H/Sko2Iux2/BTztzHlcti1wToXQcDmcrqjaPWlcSupLR51rWckd49eNh1wdKLC21s+hpMrJ7kDy38MoL9vORGW0t9F6UGwpGOoUnwKmuT+OiMGF0rQC5F3DD9LBUvR9AsXDgyV5KERD/CJQmSXhtk0qqV6hXiGaPQTs5dB7iLw2+vNgkxI2WwMjii7WUZBWRNQsiJYR0np5hpO79dnOEsuuu6uJEy6Vb9Kknw8JtChQ1WFBMgnH8EpfS/sVuZUyRQf0n9lA+BlgvD5YTE7EFXZcL3iFIXrPOSBiRmS6aISPwqGNLgYGZ7cOyN5qEKVPgQKLykYr6fi1Wu8xe</string>
-    
+    <string name="auth_title">Авторизация</string>
+    <string name="auth_login_hint">Ваше имя</string>
+    <string name="auth_enter_button_caption">Войти</string>
+    <string name="auth_network_error">Какая то сетевая ошибка</string>
+
 </resources>

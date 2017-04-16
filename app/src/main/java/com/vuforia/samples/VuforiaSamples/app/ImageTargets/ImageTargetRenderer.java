@@ -39,8 +39,8 @@ import com.vuforia.samples.SampleApplication.utils.SampleUtils;
 import com.vuforia.samples.SampleApplication.utils.Texture;
 import com.vuforia.samples.ar.data.info.InfoTextureBuilder;
 import com.vuforia.samples.ar.data.info.ProductInfoInteractor;
-import com.vuforia.samples.ar.data.models.ObjectInfo;
-import com.vuforia.samples.ar.data.models.ProductInfo;
+import com.vuforia.samples.ar.data.beans.ObjectInfo;
+import com.vuforia.samples.ar.data.beans.ProductInfo;
 import com.vuforia.samples.ar.di.DiContainer;
 
 import lombok.Getter;

@@ -8,7 +8,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.vuforia.samples.ar.data.models.ProductInfo;
+import com.vuforia.samples.ar.data.beans.ProductInfo;
 
 public class ProductInfoActivity extends Activity {
 
