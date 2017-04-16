@@ -260,7 +260,6 @@ public class ImageTargets extends Activity implements SampleApplicationControl, 
         mGlView.init(translucent, depthSize, stencilSize);
 
         mRenderer = new ImageTargetRenderer(this, vuforiaAppSession);
-        mRenderer.setTextures(mTextures);
         mGlView.setRenderer(mRenderer);
     }
 

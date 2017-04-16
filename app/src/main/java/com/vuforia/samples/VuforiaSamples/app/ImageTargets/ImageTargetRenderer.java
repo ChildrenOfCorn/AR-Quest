@@ -59,8 +59,6 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
     private ImageTargets mActivity;
     private SampleAppRenderer mSampleAppRenderer;
 
-    private Vector<Texture> mTextures;
-
     private int shaderProgramID;
     private int vertexHandle;
     private int textureCoordHandle;
@@ -141,20 +139,9 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
 
     // Function for initializing the renderer.
     private void initRendering() {
+        Log.d(TAG, "initRendering: ");
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, Vuforia.requiresAlpha() ? 0.0f
                 : 1.0f);
-
-        for (Texture t : mTextures) {
-            GLES20.glGenTextures(1, t.mTextureID, 0);
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, t.mTextureID[0]);
-            GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
-                    GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-            GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
-                    GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
-            GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA,
-                    t.mWidth, t.mHeight, 0, GLES20.GL_RGBA,
-                    GLES20.GL_UNSIGNED_BYTE, t.mData);
-        }
 
         shaderProgramID = SampleUtils.createProgramFromShaderSrc(
                 CubeShaders.CUBE_MESH_VERTEX_SHADER,
@@ -279,10 +266,6 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
 
         GLES20.glDisable(GLES20.GL_BLEND);
         GLES20.glDisable(GLES20.GL_DEPTH_TEST);
-    }
-
-    public void setTextures(Vector<Texture> textures) {
-        mTextures = textures;
     }
 
     private void getTextureByObjectInfoIfRequired(ObjectInfo objectInfo) {

@@ -1,5 +1,6 @@
 package com.vuforia.samples.ar.data.beans;
 
+import java.io.Serializable;
 import java.util.List;
 
 import lombok.Data;
@@ -11,7 +12,7 @@ import lombok.Setter;
  */
 @Data
 @Setter
-public class ProductInfo {
+public class ProductInfo implements Serializable{
 	public static int NO_RATING = -1;
 	public static float MAX_RATING = 5.0f;
 

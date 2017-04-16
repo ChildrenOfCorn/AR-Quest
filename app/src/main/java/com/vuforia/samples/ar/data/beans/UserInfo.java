@@ -1,5 +1,7 @@
 package com.vuforia.samples.ar.data.beans;
 
+import java.io.Serializable;
+
 import lombok.Data;
 
 /**
@@ -7,7 +9,7 @@ import lombok.Data;
  */
 
 @Data
-public class UserInfo {
+public class UserInfo implements Serializable{
     private long id;
     private String name;
 }
