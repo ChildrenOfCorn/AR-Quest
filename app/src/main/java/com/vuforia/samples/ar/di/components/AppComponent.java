@@ -4,6 +4,7 @@ package com.vuforia.samples.ar.di.components;
  * Created by grishberg on 16.04.17.
  */
 
+import com.vuforia.samples.VuforiaSamples.app.ProductInfoDetails.ProductInfoDetailsFragment;
 import com.vuforia.samples.ar.data.info.RemoteProductInfoInteractor;
 import com.vuforia.samples.ar.di.modules.AppModule;
 import com.vuforia.samples.ar.di.modules.RestModule;
@@ -27,4 +28,6 @@ public interface AppComponent {
     void inject(AuthActivity authActivity);
 
     void inject(RemoteProductInfoInteractor remoteProductInfoInteractor);
+
+	void inject(ProductInfoDetailsFragment productInfoDetailsFragment);
 }

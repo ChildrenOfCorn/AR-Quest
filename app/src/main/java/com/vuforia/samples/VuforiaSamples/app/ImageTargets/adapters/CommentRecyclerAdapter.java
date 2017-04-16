@@ -30,6 +30,11 @@ public class CommentRecyclerAdapter extends RecyclerView.Adapter<CommentRecycler
         notifyDataSetChanged();
     }
 
+    public void addComment(Comment comment) {
+        this.comments.add(comment);
+        notifyDataSetChanged();
+    }
+
     @Override
     public CommentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new CommentViewHolder(LayoutInflater.from(parent.getContext())
