@@ -46,7 +46,7 @@ public class ProductInfoDetailsFragment extends Fragment {
 
 
 		this.productInfo = (ProductInfo) getArguments().getSerializable(PRODUCT_INFO_TAG);
-		View rootView = inflater.inflate(R.layout.product_details, container);
+		View rootView = inflater.inflate(R.layout.product_details, null);
 		productNameTextView = (TextView) rootView.findViewById(R.id.product_details_product_name);
 		productNameTextView.setText(productInfo.getName());
 
