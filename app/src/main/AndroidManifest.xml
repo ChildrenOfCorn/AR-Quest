@@ -201,7 +201,8 @@
 
         <activity
             android:name=".app.ProductInfoDetails.ProductInfoActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme"/>
 
     </application>
 
