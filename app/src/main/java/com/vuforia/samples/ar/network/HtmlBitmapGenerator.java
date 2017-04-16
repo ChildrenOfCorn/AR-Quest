@@ -57,11 +57,9 @@ public class HtmlBitmapGenerator implements InfoTextureBuilder {
 
 		}
 
-		if (productInfo.getUrl() != null) {
+		if (productInfo.getUsers() != null && productInfo.getUsers().size() > 0) {
 			builder
-				.append(BR)
-				.append("<div style='font-size:0.9em;'>Подробнее: ")
-				.append("<img src='next.png' style='float:right;' width='12' height='20' style='padding-right:8px;'/>")
+				.append("<div style='font-size:0.9em;'>Просмотров: " + productInfo.getUsers().size())
 				.append("</div>");
 		}
 
