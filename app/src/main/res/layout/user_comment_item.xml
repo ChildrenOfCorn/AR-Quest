@@ -10,6 +10,7 @@
 
 	<ImageView
 		android:id="@+id/userIcon"
+		android:src="@drawable/ic_account_circle"
 		android:layout_width="48dp"
 		android:layout_height="48dp"
 		android:layout_alignParentLeft="true"
