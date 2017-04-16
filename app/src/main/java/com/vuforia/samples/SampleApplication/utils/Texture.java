@@ -18,11 +18,7 @@ import java.nio.ByteOrder;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.util.Log;
-
-import com.vuforia.samples.ar.data.info.InfoTextureBuilder;
-import com.vuforia.samples.ar.data.models.ProductInfo;
 
 // Support class for the Vuforia samples applications.
 // Exposes functionality for loading a texture from the APK.

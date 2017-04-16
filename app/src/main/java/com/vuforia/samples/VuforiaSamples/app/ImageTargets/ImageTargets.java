@@ -55,8 +55,8 @@ import com.vuforia.samples.VuforiaSamples.app.ProductInfoDetails.ProductInfoActi
 import com.vuforia.samples.VuforiaSamples.ui.SampleAppMenu.SampleAppMenu;
 import com.vuforia.samples.VuforiaSamples.ui.SampleAppMenu.SampleAppMenuGroup;
 import com.vuforia.samples.VuforiaSamples.ui.SampleAppMenu.SampleAppMenuInterface;
-import com.vuforia.samples.ar.data.models.ObjectInfo;
-import com.vuforia.samples.ar.data.models.ProductInfo;
+import com.vuforia.samples.ar.data.beans.ObjectInfo;
+import com.vuforia.samples.ar.data.beans.ProductInfo;
 
 public class ImageTargets extends Activity implements SampleApplicationControl, ImageTargetTouchListener,
         SampleAppMenuInterface {

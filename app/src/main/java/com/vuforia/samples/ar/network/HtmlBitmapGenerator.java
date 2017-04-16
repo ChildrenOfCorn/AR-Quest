@@ -10,7 +10,7 @@ import android.webkit.WebViewClient;
 import com.vuforia.samples.App;
 import com.vuforia.samples.SampleApplication.utils.Texture;
 import com.vuforia.samples.ar.data.info.InfoTextureBuilder;
-import com.vuforia.samples.ar.data.models.ProductInfo;
+import com.vuforia.samples.ar.data.beans.ProductInfo;
 
 /**
  * Date: 15.04.17 Time: 14:10
