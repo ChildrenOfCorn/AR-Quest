@@ -1,6 +1,5 @@
 package com.vuforia.samples.VuforiaSamples.app.ImageTargets.adapters;
 
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
