@@ -48,7 +48,7 @@ import lombok.Getter;
 // The renderer class for the ImageTargets sample.
 public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRendererControl,
         InfoTextureBuilder.OnTextureBuildListener, ProductInfoInteractor.OnProductReceivedListener {
-    private static final String LOGTAG = "ImageTargetRenderer";
+    private static final String TAG = "ImageTargetRenderer";
     private static final float PANEL_RIGHT_OFFSET = 0.2f;
 
     private ProductInfoInteractor productInfoInteractor;
@@ -116,7 +116,7 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
     // Called when the surface is created or recreated.
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        Log.d(LOGTAG, "GLRenderer.onSurfaceCreated");
+        Log.d(TAG, "GLRenderer.onSurfaceCreated");
 
         // Call Vuforia function to (re)initialize rendering after first use
         // or after OpenGL ES context was lost (e.g. after onPause/onResume):
@@ -128,7 +128,7 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
     // Called when the surface changed size.
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-        Log.d(LOGTAG, "GLRenderer.onSurfaceChanged");
+        Log.d(TAG, "GLRenderer.onSurfaceChanged");
 
         // Call Vuforia function to handle render surface size changes:
         vuforiaAppSession.onSurfaceChanged(width, height);
@@ -178,7 +178,7 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
                         "ImageTargets/Buildings.txt");
                 mModelIsLoaded = true;
             } catch (IOException e) {
-                Log.e(LOGTAG, "Unable to load buildings");
+                Log.e(TAG, "Unable to load buildings");
             }
 
             // Hide the Loading Dialog
@@ -211,15 +211,16 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
 
         // Did we find any trackables this frame?
         for (int tIdx = 0; tIdx < state.getNumTrackableResults(); tIdx++) {
+            objectinfoRequested = true;
             TrackableResult result = state.getTrackableResult(tIdx);
             Trackable trackable = result.getTrackable();
 
             getTextureByObjectInfoIfRequired((ObjectInfo) trackable.getUserData());
-            objectinfoRequested = true;
 
             if (prevTexture == null) {
                 continue;
-            } else if(!prevTexture.isReady()) {
+            }
+            if (!prevTexture.isReady()) {
                 initTexture(prevTexture);
             }
 
@@ -271,7 +272,9 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
         }
 
         if (!objectinfoRequested) {
+            lastTargetId = -1;
             currentProductInfo = null;
+            prevTexture = null;
         }
 
         GLES20.glDisable(GLES20.GL_BLEND);
@@ -292,8 +295,9 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
 
         lastTargetId = targetId;
 
-        Log.d(LOGTAG, "Current product info was reset");
+        Log.d(TAG, "Current product info was reset");
         currentProductInfo = null;
+        prevTexture = null;
 
         productInfoInteractor.getProductInfoByTargetId(targetId);
     }
@@ -302,17 +306,18 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
         GLES20.glGenTextures(1, texture.mTextureID, 0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture.mTextureID[0]);
         GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
-                               GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+                GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
         GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
-                               GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+                GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
         GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA,
-                            texture.mWidth, texture.mHeight, 0, GLES20.GL_RGBA,
-                            GLES20.GL_UNSIGNED_BYTE, texture.mData);
+                texture.mWidth, texture.mHeight, 0, GLES20.GL_RGBA,
+                GLES20.GL_UNSIGNED_BYTE, texture.mData);
         texture.setReady(true);
     }
+
     @Override
     public void onProductInfoReceived(@NonNull ProductInfo productInfo) {
-        Log.d(LOGTAG, "UserData:Retrieved User Data	\"" + productInfo + "\"");
+        Log.d(TAG, "UserData:Retrieved User Data	\"" + productInfo + "\"");
 
         this.currentProductInfo = productInfo;
         this.lastProductInfo = productInfo;
@@ -322,6 +327,7 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
 
     @Override
     public void onTextureReady(Texture texture) {
+        Log.d(TAG, "onTextureReady: texture = " + texture);
         prevTexture = texture;
     }
 }
