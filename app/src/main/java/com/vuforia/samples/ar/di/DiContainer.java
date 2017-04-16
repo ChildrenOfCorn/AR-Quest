@@ -17,7 +17,6 @@ public class DiContainer {
     }
 
     public static InfoTextureBuilder provideInfoTextureBuilder() {
-        //return new StubInfoTextureBuilder(App.getAppContext().getAssets());
         return new HtmlBitmapGenerator();
     }
 
