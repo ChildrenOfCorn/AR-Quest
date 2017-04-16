@@ -1,6 +1,4 @@
-package com.vuforia.samples.ar.data.models;
-
-import java.util.List;
+package com.vuforia.samples.ar.data.beans;
 
 import lombok.Data;
 

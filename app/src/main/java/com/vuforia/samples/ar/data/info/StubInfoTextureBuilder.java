@@ -5,7 +5,7 @@ import android.opengl.GLES20;
 import android.support.annotation.Nullable;
 
 import com.vuforia.samples.SampleApplication.utils.Texture;
-import com.vuforia.samples.ar.data.models.ProductInfo;
+import com.vuforia.samples.ar.data.beans.ProductInfo;
 
 import lombok.NonNull;
 

@@ -3,7 +3,7 @@ package com.vuforia.samples.VuforiaSamples.app.ImageTargets;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
-import com.vuforia.samples.ar.data.models.ProductInfo;
+import com.vuforia.samples.ar.data.beans.ProductInfo;
 
 class ImageTargetGestureListener extends GestureDetector.SimpleOnGestureListener {
 

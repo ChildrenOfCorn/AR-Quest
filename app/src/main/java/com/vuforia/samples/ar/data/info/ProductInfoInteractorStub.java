@@ -1,7 +1,7 @@
 package com.vuforia.samples.ar.data.info;
 
-import com.vuforia.samples.ar.data.models.Comment;
-import com.vuforia.samples.ar.data.models.ProductInfo;
+import com.vuforia.samples.ar.data.beans.Comment;
+import com.vuforia.samples.ar.data.beans.ProductInfo;
 
 import java.util.ArrayList;
 

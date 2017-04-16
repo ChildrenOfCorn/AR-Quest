@@ -24,7 +24,12 @@ android {
     }
 
     archivesBaseName = rootProject.projectDir.getName()
-	
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    
     buildTypes {
         release {
             minifyEnabled false
@@ -47,7 +52,7 @@ dependencies {
     String support_version = "25.2.0"
     String okhttp_version = "3.4.1"
     String lombok_version = "1.12.6"
-    String retrofit_version = "2.2.0"
+    String retrofit_version = "2.1.0"
     String dagger_version = "2.9"
 
     compile "com.android.support:appcompat-v7:$support_version"
@@ -63,11 +68,22 @@ dependencies {
     provided "org.projectlombok:lombok:$lombok_version"
     apt "org.projectlombok:lombok:$lombok_version"
 
+
+    // retorfit
     compile "com.squareup.retrofit2:retrofit:$retrofit_version"
     compile "com.squareup.retrofit2:converter-gson:$retrofit_version"
     compile "com.squareup.retrofit2:converter-protobuf:$retrofit_version"
     compile "com.squareup.retrofit2:adapter-rxjava:$retrofit_version"
 
+    //dagger
+    testCompile "com.google.dagger:dagger:$dagger_version"
+    compile "com.google.dagger:dagger:$dagger_version"
+    apt "com.google.dagger:dagger-compiler:$dagger_version"
+    testApt "com.google.dagger:dagger-compiler:$dagger_version"
+    //rx
+    compile 'io.reactivex:rxandroid:1.2.1'
+
+    //gson
     compile 'com.google.code.gson:gson:2.7'
 
     compile "com.google.dagger:dagger:$dagger_version"
