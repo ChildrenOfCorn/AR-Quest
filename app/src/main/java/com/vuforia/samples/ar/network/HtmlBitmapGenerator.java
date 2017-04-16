@@ -21,10 +21,9 @@ import com.vuforia.samples.ar.data.beans.ProductInfo;
 public class HtmlBitmapGenerator implements InfoTextureBuilder {
 
 	private static final int container_size = 500;
-
+	private static final String BR = "<br>";
 	private WebView webView;
 	private OnTextureBuildListener listener;
-	private static final String BR = "<br>";
 
 	public HtmlBitmapGenerator() {
 		this.webView = new WebView(App.getAppContext());
@@ -34,24 +33,38 @@ public class HtmlBitmapGenerator implements InfoTextureBuilder {
 		StringBuilder builder = new StringBuilder(1024);
 		builder.append("<html>")
 			.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"product_info.css\">")
-			.append("<body><div style='font-size:2em'>")
+			.append("<body><div style='font-size:2em;'>")
 			.append(productInfo.getName())
 			.append("</div>")
 			.append(productInfo.getBriefDesc());
 
 		if (productInfo.getRating() != ProductInfo.NO_RATING) {
+
 			builder.append(BR);
 			builder.append("<div class=\"ratings\">\n"
 							   + "    <div class=\"empty-stars\"></div>"
 							   + "    <div class=\"full-stars\" style=\"width:")
-				.append(productInfo.getRatingInPercents()+"%\"></div>"
-							   + "</div>");
+				.append(productInfo.getRatingInPercents() + "%\">")
+				.append("</div>")
+				.append("</div>");
 		}
 
 		if (productInfo.getComments() != null && productInfo.getComments().size() > 0) {
-			builder.append(BR)
-			.append("Комментариев: " + productInfo.getComments().size());
+			builder
+				.append("<div style='font-size:0.9em;'>Комментариев: " + productInfo.getComments().size())
+				.append("<img src='next.png' style='float:right;' width='12' height='20' style='padding-right:8px;'/>")
+				.append("</div>");
+
 		}
+
+		if (productInfo.getUrl() != null) {
+			builder
+				.append(BR)
+				.append("<div style='font-size:0.9em;'>Подробнее: ")
+				.append("<img src='next.png' style='float:right;' width='12' height='20' style='padding-right:8px;'/>")
+				.append("</div>");
+		}
+
 		builder.append("</body></html>");
 		return builder.toString();
 	}
@@ -64,7 +77,7 @@ public class HtmlBitmapGenerator implements InfoTextureBuilder {
 			@Override
 			public void run() {
 				webView.setWebViewClient(webClient);
-				webView.layout(0, 0, 800, 800);
+				webView.layout(0, 0, container_size, container_size);
 				webView.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null);
 
 				webView.setPictureListener(new WebView.PictureListener() {
