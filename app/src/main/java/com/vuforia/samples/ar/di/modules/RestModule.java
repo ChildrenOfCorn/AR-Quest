@@ -3,10 +3,12 @@ package com.vuforia.samples.ar.di.modules;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
+import com.vuforia.samples.App;
 import com.vuforia.samples.ar.common.data.rest.RxErrorHandlingCallAdapterFactory;
 import com.vuforia.samples.ar.common.data.rest.SoftErrorDelegate;
 import com.vuforia.samples.ar.data.beans.common.RestResponse;
 import com.vuforia.samples.ar.repository.AuthTokenRepository;
+import com.vuforia.samples.ar.repository.AuthTokenRepositoryImpl;
 import com.vuforia.samples.ar.repository.auth.AuthRepository;
 import com.vuforia.samples.ar.repository.auth.AuthRepositoryImpl;
 import com.vuforia.samples.ar.rest.Api;
@@ -96,7 +98,15 @@ public class RestModule {
         return new ErrorCheckerImpl();
     }
 
-    AuthRepository provideAuthTokenRepository(final Api api, final AuthTokenRepository authRepository) {
+    @Provides
+    @Singleton
+    AuthTokenRepository provideAuthTokenRepository() {
+        return new AuthTokenRepositoryImpl(App.getAppContext());
+    }
+
+    @Provides
+    @Singleton
+    AuthRepository provideAuthRepository(final Api api, final AuthTokenRepository authRepository) {
         return new AuthRepositoryImpl(api, authRepository);
     }
 }

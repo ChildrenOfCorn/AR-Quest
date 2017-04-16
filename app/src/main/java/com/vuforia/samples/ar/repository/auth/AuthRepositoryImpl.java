@@ -5,6 +5,7 @@ package com.vuforia.samples.ar.repository.auth;
  */
 
 import com.vuforia.samples.ar.repository.AuthTokenRepository;
+import com.vuforia.samples.ar.repository.SimpleCallback;
 import com.vuforia.samples.ar.rest.Api;
 
 import rx.Observable;
@@ -26,8 +27,8 @@ public class AuthRepositoryImpl implements AuthRepository {
     }
 
     @Override
-    public Observable<Boolean> auth(final String name) {
-        return api.auth(name)
+    public void auth(final String name, SimpleCallback<Boolean> callback) {
+        api.auth(name)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .flatMap(response -> {
@@ -35,6 +36,12 @@ public class AuthRepositoryImpl implements AuthRepository {
                     authRepository.setCurrentLogin(name);
                     authRepository.setAuthInfo(response.getData());
                     return Observable.just(true);
-                });
+                })
+                .subscribe(success -> {
+                            callback.onSuccess(true);
+                        },
+                        error -> {
+                            callback.onFail(error);
+                        });
     }
 }

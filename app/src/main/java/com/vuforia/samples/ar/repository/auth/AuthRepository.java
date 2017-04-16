@@ -1,5 +1,7 @@
 package com.vuforia.samples.ar.repository.auth;
 
+import com.vuforia.samples.ar.repository.SimpleCallback;
+
 import rx.Observable;
 
 /**
@@ -7,5 +9,5 @@ import rx.Observable;
  */
 
 public interface AuthRepository {
-    Observable<Boolean> auth(String name);
+    void auth(String name, SimpleCallback<Boolean> callback);
 }

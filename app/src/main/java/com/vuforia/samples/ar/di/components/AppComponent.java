@@ -6,6 +6,7 @@ package com.vuforia.samples.ar.di.components;
 
 import com.vuforia.samples.ar.di.modules.AppModule;
 import com.vuforia.samples.ar.di.modules.RestModule;
+import com.vuforia.samples.VuforiaSamples.app.ImageTargets.AuthActivity;
 
 import javax.inject.Singleton;
 
@@ -22,4 +23,5 @@ import dagger.Component;
 
 public interface AppComponent {
 
+    void inject(AuthActivity authActivity);
 }
