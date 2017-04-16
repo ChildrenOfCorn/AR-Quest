@@ -5,7 +5,7 @@
 	android:layout_height="match_parent">
 
 	<TextView
-		android:id="@+id/title"
+		android:id="@+id/product_details_product_name"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_alignParentTop="true"
@@ -17,10 +17,10 @@
 		tools:text="Item name" />
 
 	<LinearLayout
-		android:id="@+id/ratingContainer"
+		android:id="@+id/product_details_ratingContainer"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_below="@id/title"
+		android:layout_below="@id/product_details_product_name"
 		android:layout_marginTop="8dp"
 		android:paddingLeft="8dp"
 		android:paddingRight="8dp">
@@ -33,7 +33,7 @@
 			android:textSize="16sp" />
 
 		<RatingBar
-			android:id="@+id/ratingBar"
+			android:id="@+id/product_details_ratingBar"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:layout_weight="1"
@@ -44,7 +44,7 @@
 	</LinearLayout>
 
 	<LinearLayout
-		android:id="@+id/addCommentContainer"
+		android:id="@+id/product_details_addCommentContainer"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_alignParentBottom="true"
@@ -53,13 +53,13 @@
 		android:padding="8dp">
 
 		<EditText
-			android:id="@+id/addCommentEditText"
+			android:id="@+id/product_details_addCommentEditText"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:layout_weight="1" />
 
 		<Button
-			android:id="@+id/addCommentButton"
+			android:id="@+id/product_details_addCommentButton"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_marginLeft="8dp"
@@ -68,9 +68,10 @@
 	</LinearLayout>
 
 	<android.support.v7.widget.RecyclerView
+		android:id="@+id/product_details_recycler_view"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_above="@id/addCommentContainer"
-		android:layout_below="@id/ratingContainer" />
+		android:layout_above="@id/product_details_addCommentContainer"
+		android:layout_below="@id/product_details_ratingContainer" />
 
 </RelativeLayout>
