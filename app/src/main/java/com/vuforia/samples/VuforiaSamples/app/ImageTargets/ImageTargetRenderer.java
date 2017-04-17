@@ -40,21 +40,18 @@ import com.vuforia.samples.ar.data.info.InfoTextureBuilder;
 import com.vuforia.samples.ar.data.info.ProductInfoInteractor;
 import com.vuforia.samples.ar.data.beans.ObjectInfo;
 import com.vuforia.samples.ar.data.beans.ProductInfo;
+import com.vuforia.samples.ar.data.info.ProductInfoTextureManager;
 import com.vuforia.samples.ar.di.DiContainer;
 import com.vuforia.samples.ar.repository.SimpleCallback;
 
 import lombok.Getter;
 
 // The renderer class for the ImageTargets sample.
-public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRendererControl,
-        ProductInfoInteractor.OnProductReceivedListener {
+public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRendererControl{
     private static final String TAG = "ImageTargetRenderer";
     private static final float PANEL_RIGHT_OFFSET = 0.2f;
 
-    private ProductInfoInteractor productInfoInteractor;
-    private InfoTextureBuilder infoTextureBuilder;
-    private TextureManager textureManager;
-    private ProductInfoManager productInfoManager;
+    private ProductInfoTextureManager productInfoTextureManager;
 
     private SampleApplicationSession vuforiaAppSession;
     private ImageTargets mActivity;
@@ -82,11 +79,7 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
     private static final float OBJECT_SCALE_FLOAT = 0.001f;
 
     public ImageTargetRenderer(ImageTargets activity, SampleApplicationSession session) {
-        productInfoInteractor = DiContainer.provideProductInfoInteractor();
-        productInfoInteractor.setOnProductReceivedListener(this);
-        infoTextureBuilder = DiContainer.provideInfoTextureBuilder();
-        textureManager = new TextureManager();
-        productInfoManager = new ProductInfoManager();
+        productInfoTextureManager = DiContainer.provideProductInfoManager();
 
         mActivity = activity;
         vuforiaAppSession = session;
@@ -198,8 +191,7 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
         boolean objectinfoRequested = false;
 
         // Did we find any trackables this frame?
-        textureManager.updateOldTextures(state);
-        productInfoManager.updateOldTextures(state);
+        productInfoTextureManager.updateRecognizedObjects(state);
 
         for (int tIdx = 0; tIdx < state.getNumTrackableResults(); tIdx++) {
             objectinfoRequested = true;
@@ -207,9 +199,7 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
             Trackable trackable = result.getTrackable();
 
             ObjectInfo objectInfo = (ObjectInfo) trackable.getUserData();
-            getTextureByObjectInfoIfRequired(objectInfo);
-
-            Texture currentTexture = textureManager.getTexture(objectInfo);
+            Texture currentTexture = productInfoTextureManager.getTextureForObject(objectInfo);
             if (currentTexture == null) {
                 continue;
             }
@@ -273,16 +263,6 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
         GLES20.glDisable(GLES20.GL_DEPTH_TEST);
     }
 
-    private void getTextureByObjectInfoIfRequired(ObjectInfo objectInfo) {
-        long targetId = objectInfo.getId();
-        //TODO множественное распознование не оч работает
-        if (!productInfoManager.checkProductInfo(objectInfo)) {
-            Log.d(TAG, "productInfoForObject == null");
-            productInfoInteractor.getProductInfoByTargetId(targetId);
-            return;
-        }
-    }
-
     private void initTexture(final Texture texture) {
         GLES20.glGenTextures(1, texture.mTextureID, 0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture.mTextureID[0]);
@@ -296,24 +276,4 @@ public class ImageTargetRenderer implements GLSurfaceView.Renderer, SampleAppRen
         texture.setReady(true);
     }
 
-    @Override
-    public void onProductInfoReceived(@NonNull ProductInfo productInfo) {
-        Log.d(TAG, "UserData:Retrieved User Data	\"" + productInfo + "\"");
-
-        productInfoManager.putProductInfo(productInfo.getId(), productInfo);
-        this.currentProductInfo = productInfo;
-
-        infoTextureBuilder.getTextureBitmapFromInfo(productInfo, new SimpleCallback<Texture>() {
-            @Override
-            public void onSuccess(Texture result) {
-                Log.d(TAG, "onTextureReady: texture = " + result);
-                textureManager.putTexture(productInfo.getId(), result);
-            }
-
-            @Override
-            public void onFail(Throwable error) {
-                Log.e(TAG, "onFail: ", error);
-            }
-        });
-    }
 }

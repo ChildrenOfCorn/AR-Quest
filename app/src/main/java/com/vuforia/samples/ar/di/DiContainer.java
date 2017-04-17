@@ -2,6 +2,8 @@ package com.vuforia.samples.ar.di;
 
 import com.vuforia.samples.ar.data.info.InfoTextureBuilder;
 import com.vuforia.samples.ar.data.info.ProductInfoInteractor;
+import com.vuforia.samples.ar.data.info.ProductInfoTextureManager;
+import com.vuforia.samples.ar.data.info.ProductInfoTextureManagerImpl;
 import com.vuforia.samples.ar.data.info.RemoteProductInfoInteractor;
 import com.vuforia.samples.ar.di.components.AppComponent;
 import com.vuforia.samples.ar.network.HtmlBitmapGenerator;
@@ -12,6 +14,11 @@ import com.vuforia.samples.ar.network.HtmlBitmapGenerator;
  */
 
 public class DiContainer {
+
+    public static ProductInfoTextureManager provideProductInfoManager() {
+        return new ProductInfoTextureManagerImpl(provideInfoTextureBuilder());
+    }
+
     public static ProductInfoInteractor provideProductInfoInteractor() {
         return new RemoteProductInfoInteractor();
     }
